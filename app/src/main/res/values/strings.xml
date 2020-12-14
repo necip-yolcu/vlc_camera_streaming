@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">Camera Streaming</string>
+
+    <string name="kamera_sec">Kamera</string>
+    <string name="ip_cam_http">1 (HTTP)</string>
+    <string name="ip_cam_rtsp">2 (RTSP)</string>
+
+    <string name="resolution_label">Çözünürlük</string>
+    <string name="resolution_times"> x </string>
+    <string-array name="resolution_array_res">
+        <item>1920x1080</item>
+        <item>1080x1920</item>
+        <item>1280x720</item>
+        <item>720x1280</item>
+        <item>800x600</item>
+        <item>600x800</item>
+        <item>640x480</item>
+        <item>480x640</item>
+        <item>320x240</item>
+        <item>240x320</item>
+        <item>176x144</item>
+        <item>144x176</item>
+        <item>Custom</item>
+    </string-array>
+
+    <string name="ip_setting_label">Adres</string>
+    <string name="address_dot">.</string>
+
+    <string name="port_setting_label">Port no</string>
+
+    <string name="username_setting_label">Kullanıcı adı</string>
+
+    <string name="password_setting_label">Şifre</string>
+
+    <string name="command_setting_label">Uzantı</string>
+    <string-array name="command_array_res">
+        <item>/snap.jpg</item>
+        <item>/0</item>
+        <item>/1</item>
+        <item>/2</item>
+        <item>/cam1/onvif-h264</item>
+        <item>/cam/realmonitor</item>
+        <item>/Onvif/live/1/1</item>
+        <item>/ch0_0.h264</item>
+        <item>Custom</item>
+    </string-array>
+
+    <string name="txtWebLink">
+        <u>
+            <font color='blue'>ip kamera uzantımı bul</font>
+        </u>
+    </string>
+
+
+
+    <string name="Mevcut">MEVCUT</string>
+    <string name="Kapasite">KAPASİTE</string>
+    <string name="girebilir">GİREBİLİR</string>
+    <string name="play">OYNAT!</string>
+
+    <string-array name="cv_array_res">
+        <item>Motion Detection 1</item>
+        <item>Motion Detection 2</item>
+        <item>Face Detection</item>
+        <item>No Scanning</item>
+    </string-array>
+
+</resources>

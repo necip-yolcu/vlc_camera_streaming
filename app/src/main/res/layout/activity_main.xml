@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+
+    <Button
+        android:id="@+id/btn_internal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btnClickNextActivity"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="DAHİLİ KAMERA"
+        android:textSize="36sp"
+        app:backgroundTint="#FF9800" />
+
+    <Button
+        android:id="@+id/btn_external"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="btnClickNextActivity"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="HARİCİ KAMERA"
+        android:textSize="36sp"
+        app:backgroundTint="#009688" />
+</LinearLayout>

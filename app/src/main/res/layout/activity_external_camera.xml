@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ExternalCameraActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="linearLayoutTappedS"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_option_1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#2196F3"
+                android:gravity="center"
+                android:onClick="TextOptionClick"
+                android:text="SEÇENEK 1"
+                android:textStyle="bold"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout_option_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#88C2F1"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="8dp"
+                    android:text="RTSP URL"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+
+                <EditText
+                    android:id="@+id/textRTSPUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:ems="10"
+                    android:hint="rtsp://{user}:{pass}@host:554/{videosource}"
+                    android:inputType="textPersonName"
+                    android:paddingLeft="8dp"
+                    android:text="rtsp://admin:1625necip@192.168.0.183:554/1" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txt_option_2"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#4CAF50"
+                android:gravity="center"
+                android:onClick="TextOptionClick"
+                android:text="SEÇENEK 2"
+                android:textStyle="bold"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout_option_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#93DA96"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:text="@string/kamera_sec"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <RadioGroup
+                        android:id="@+id/port_radiogroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/r_b_ip_http"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ip_cam_http" />
+
+                        <RadioButton
+                            android:id="@+id/r_b_ip_rtsp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/ip_cam_rtsp" />
+                    </RadioGroup>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:text="@string/ip_setting_label"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/address1_input"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:hint="192"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/address_dot" />
+
+                    <EditText
+                        android:id="@+id/address2_input"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:hint="168"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/address_dot" />
+
+                    <EditText
+                        android:id="@+id/address3_input"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:digits="0123456789"
+                        android:gravity="right|center_vertical"
+                        android:hint="0"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:singleLine="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/address_dot" />
+
+                    <EditText
+                        android:id="@+id/address4_input"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:hint="183"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:singleLine="true" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:text="@string/port_setting_label"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/port_input"
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:hint="80/8080/554"
+                        android:inputType="number"
+                        android:maxLength="4"
+                        android:singleLine="true" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:text="@string/username_setting_label"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/username_input"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:hint="Kullanıcı adını giriniz"
+                        android:singleLine="true" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:text="@string/password_setting_label"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/password_input"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left|center_vertical"
+                        android:hint="Şifreyi giriniz"
+                        android:singleLine="true" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:text="@string/command_setting_label"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <Spinner
+                        android:id="@+id/resolution_spinner_command"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"></Spinner>
+
+                    <EditText
+                        android:id="@+id/command_input"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:hint="Şifreyi giriniz"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        tools:ignore="RtlHardcoded" />
+
+                    <TextView
+                        android:id="@+id/txt_weblink"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:text="@string/txtWebLink"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#9C27B0"
+                android:paddingLeft="8dp"
+                android:text="@string/resolution_label"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#DA70EC"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/resolution_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"></Spinner>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#DA70EC"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/width_input"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right|center_vertical"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/resolution_times" />
+
+                <EditText
+                    android:id="@+id/height_input"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/buttonStart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/play"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="#000000"
+                android:textSize="72sp"
+                app:backgroundTint="#FFC107" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
