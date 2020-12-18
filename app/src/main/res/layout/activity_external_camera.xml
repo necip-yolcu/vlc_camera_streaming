@@ -8,7 +8,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        tools:ignore="UselessParent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -16,75 +17,86 @@
             android:onClick="linearLayoutTappedS"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/txt_option_1"
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch1"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="#2196F3"
                 android:gravity="center"
-                android:onClick="TextOptionClick"
-                android:text="SEÇENEK 1"
+                android:text="@string/switch1"
                 android:textStyle="bold"
-                android:visibility="visible" />
+                android:onClick="SwitchClick"
+                android:theme="@style/SwitchTheme"/>
 
             <LinearLayout
                 android:id="@+id/linearLayout_option_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#88C2F1"
-                android:orientation="vertical"
-                android:visibility="visible">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingLeft="8dp"
-                    android:text="RTSP URL"
+                    android:paddingStart="8dp"
+                    android:text="@string/rtsp_url_set"
                     android:textStyle="bold"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    tools:ignore="RtlSymmetry" />
 
                 <EditText
                     android:id="@+id/textRTSPUrl"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:ems="10"
-                    android:hint="rtsp://{user}:{pass}@host:554/{videosource}"
+                    android:hint="@string/textRTSPUrl_hint"
                     android:inputType="textPersonName"
-                    android:paddingLeft="8dp"
-                    android:text="rtsp://admin:1625necip@192.168.0.183:554/1" />
+                    android:paddingStart="8dp"
+                    android:text="@string/textRTSPUrl_text"
+                    tools:ignore="Autofill,RtlSymmetry,TextFields" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/txt_option_2"
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch2"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="#4CAF50"
                 android:gravity="center"
-                android:onClick="TextOptionClick"
-                android:text="SEÇENEK 2"
+                android:onClick="SwitchClick"
+                android:shadowColor="#FFFFFF"
+                android:text="@string/switch2"
                 android:textStyle="bold"
-                android:visibility="visible" />
+                android:theme="@style/SwitchTheme"/>
 
             <LinearLayout
                 android:id="@+id/linearLayout_option_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#93DA96"
-                android:orientation="vertical"
-                android:visibility="visible">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
-                    android:text="@string/kamera_sec"
-                    android:textStyle="bold" />
+                    android:paddingStart="8dp"
+                    android:text="@string/protocol_set"
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:layout_gravity="center">
+
+                    <EditText
+                        android:id="@+id/protocol_input"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:singleLine="true"
+                        tools:ignore="Autofill,LabelFor,RtlHardcoded,TextFields" />
 
                     <RadioGroup
                         android:id="@+id/port_radiogroup"
@@ -102,7 +114,6 @@
                             android:id="@+id/r_b_ip_rtsp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
                             android:text="@string/ip_cam_rtsp" />
                     </RadioGroup>
 
@@ -111,9 +122,10 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
                     android:text="@string/ip_setting_label"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry" />
 
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -126,10 +138,11 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:gravity="right|center_vertical"
-                        android:hint="192"
+                        android:hint="@string/address1_input_hint"
                         android:inputType="number"
                         android:maxLength="3"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="Autofill,RtlHardcoded" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -141,10 +154,11 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:gravity="right|center_vertical"
-                        android:hint="168"
+                        android:hint="@string/address2_input_hint"
                         android:inputType="number"
                         android:maxLength="3"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="Autofill,RtlHardcoded" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -157,10 +171,11 @@
                         android:layout_height="wrap_content"
                         android:digits="0123456789"
                         android:gravity="right|center_vertical"
-                        android:hint="0"
+                        android:hint="@string/address3_input_hint"
                         android:inputType="number"
                         android:maxLength="3"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="Autofill,RtlHardcoded" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -172,19 +187,21 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:gravity="right|center_vertical"
-                        android:hint="183"
+                        android:hint="@string/address4_input_hint"
                         android:inputType="number"
                         android:maxLength="3"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="Autofill,RtlHardcoded" />
 
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
                     android:text="@string/port_setting_label"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry" />
 
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -197,19 +214,21 @@
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:hint="80/8080/554"
+                        android:hint="@string/port_input_hint"
                         android:inputType="number"
                         android:maxLength="4"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="Autofill" />
 
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
                     android:text="@string/username_setting_label"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry" />
 
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -222,17 +241,19 @@
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:gravity="left|center_vertical"
-                        android:hint="Kullanıcı adını giriniz"
-                        android:singleLine="true" />
+                        android:hint="@string/username_input_hint"
+                        android:singleLine="true"
+                        tools:ignore="Autofill,RtlHardcoded,TextFields" />
 
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
                     android:text="@string/password_setting_label"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry" />
 
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -245,17 +266,19 @@
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:gravity="left|center_vertical"
-                        android:hint="Şifreyi giriniz"
-                        android:singleLine="true" />
+                        android:hint="@string/password_input_hint"
+                        android:singleLine="true"
+                        tools:ignore="Autofill,RtlHardcoded,TextFields" />
 
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
                     android:text="@string/command_setting_label"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry" />
 
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -264,19 +287,19 @@
                     android:orientation="vertical">
 
                     <Spinner
-                        android:id="@+id/resolution_spinner_command"
+                        android:id="@+id/command_spinner"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"></Spinner>
+                        android:layout_height="wrap_content" />
 
                     <EditText
                         android:id="@+id/command_input"
                         android:layout_width="180dp"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:hint="Şifreyi giriniz"
+                        android:hint="@string/command_input_hint"
                         android:inputType="text"
                         android:singleLine="true"
-                        tools:ignore="RtlHardcoded" />
+                        tools:ignore="Autofill,RtlHardcoded"/>
 
                     <TextView
                         android:id="@+id/txt_weblink"
@@ -295,9 +318,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#9C27B0"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/resolution_label"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:ignore="RtlSymmetry" />
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -309,7 +333,7 @@
                 <Spinner
                     android:id="@+id/resolution_spinner"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></Spinner>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
@@ -326,7 +350,8 @@
                     android:gravity="right|center_vertical"
                     android:inputType="number"
                     android:maxLength="4"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    tools:ignore="Autofill,LabelFor,RtlHardcoded" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -340,13 +365,15 @@
                     android:gravity="left|center_vertical"
                     android:inputType="number"
                     android:maxLength="4"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    tools:ignore="Autofill,LabelFor,RtlHardcoded" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/buttonStart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:onClick="onClickPLAY"
                 android:text="@string/play"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#000000"

@@ -13,4 +13,35 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+
+    <!-- My color. -->
+    <style name="AppTheme.ExternalCameraStatusBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorExternalCamera</item>
+    </style>
+
+    <style name="AppTheme.InternalCameraStatusBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorInternalCamera</item>
+    </style>
+
+    <style name="SwitchTheme" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency)      -->
+        <item name="colorControlActivated">#FF4081</item>
+
+        <!-- inactive thumb color
+        <item name="colorSwitchThumbNormal">#f1f1f1</item>      -->
+
+        <!-- inactive track color (30% transparency)
+        <item name="android:colorForeground">#42221f1f</item>   -->
+    </style>
+
+    <style name="Widget.Button.Toggle" parent="android:Widget">
+        <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
+    </style>
+
+    <style name="toggleButton"  parent="Theme.AppCompat.DayNight">
+        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle</item>
+        <item name="android:textOn">açık</item>
+        <item name="android:textOff">kapalı</item>
+    </style>
+
 </resources>

@@ -1,9 +1,35 @@
 <resources>
     <string name="app_name">Camera Streaming</string>
 
-    <string name="kamera_sec">Kamera</string>
+    <string name="protocol_set">Protokol</string>
     <string name="ip_cam_http">1 (HTTP)</string>
     <string name="ip_cam_rtsp">2 (RTSP)</string>
+
+    <string name="ip_setting_label">Adres</string>
+    <string name="address_dot">.</string>
+
+    <string name="port_setting_label">Port no</string>
+    <string name="username_setting_label">Kullanıcı adı</string>
+    <string name="password_setting_label">Şifre</string>
+
+    <string name="command_setting_label">Uzantı</string>
+    <string-array name="command_array_res">
+        <item>snap.jpg (for photo)</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>cam1/onvif-h264</item>
+        <item>cam/realmonitor</item>
+        <item>Onvif/live/1/1</item>
+        <item>ch0_0.h264</item>
+        <item>Custom</item>
+    </string-array>
+
+    <string name="txtWebLink">
+        <u>
+            <font color='blue'>ip kamera uzantımı bul</font>
+        </u>
+    </string>
 
     <string name="resolution_label">Çözünürlük</string>
     <string name="resolution_times"> x </string>
@@ -23,40 +49,27 @@
         <item>Custom</item>
     </string-array>
 
-    <string name="ip_setting_label">Adres</string>
-    <string name="address_dot">.</string>
 
-    <string name="port_setting_label">Port no</string>
-
-    <string name="username_setting_label">Kullanıcı adı</string>
-
-    <string name="password_setting_label">Şifre</string>
-
-    <string name="command_setting_label">Uzantı</string>
-    <string-array name="command_array_res">
-        <item>/snap.jpg</item>
-        <item>/0</item>
-        <item>/1</item>
-        <item>/2</item>
-        <item>/cam1/onvif-h264</item>
-        <item>/cam/realmonitor</item>
-        <item>/Onvif/live/1/1</item>
-        <item>/ch0_0.h264</item>
-        <item>Custom</item>
-    </string-array>
-
-    <string name="txtWebLink">
-        <u>
-            <font color='blue'>ip kamera uzantımı bul</font>
-        </u>
-    </string>
-
-
-
-    <string name="Mevcut">MEVCUT</string>
-    <string name="Kapasite">KAPASİTE</string>
-    <string name="girebilir">GİREBİLİR</string>
+    <string name="start">BAŞLAT</string>
+    <string name="current">MEVCUT</string>
+    <string name="capacity">KAPASİTE</string>
+    <string name="enter">GİREBİLİR</string>
     <string name="play">OYNAT!</string>
+    <string name="switch1">SEÇENEK 1</string>
+    <string name="switch2">SEÇENEK 2</string>
+    <string name="command_input_hint">URL uzantısını giriniz</string>
+    <string name="password_input_hint">Şifreyi giriniz</string>
+    <string name="username_input_hint">Kullanıcı adınızı giriniz</string>
+    <string name="port_input_hint">80/8080/554</string>
+    <string name="address4_input_hint">183</string>
+    <string name="address3_input_hint">0</string>
+    <string name="address2_input_hint">168</string>
+    <string name="address1_input_hint">192</string>
+    <string name="textRTSPUrl_hint">rtsp://{user}:{pass}@host:554/{videosource}</string>
+    <string name="textRTSPUrl_text">rtsp://admin:1625necip@192.168.0.183:554/1</string>
+    <string name="rtsp_url_set">RTSP URL</string>
+    <string name="tgl_cam_text_off">Ön Kamera</string>
+    <string name="tgl_cam_text_on">Arka Kamera</string>
 
     <string-array name="cv_array_res">
         <item>Motion Detection 1</item>

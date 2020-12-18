@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/video_linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_dark"
+    android:background="#009900"
     android:keepScreenOn="true"
     android:orientation="vertical"
     tools:context=".VideoActivity">
@@ -12,18 +13,53 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
-        <ImageView
-            android:id="@+id/imageView"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7"
-            android:src="@drawable/ic_launcher_background"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight="7" >
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_launcher_background"
+                tools:ignore="ContentDescription"/>
+
+            <org.opencv.android.JavaCameraView
+                android:id="@+id/myAndroidCameraView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="0dp"
+                app:show_fps="true" />
+
+            <ToggleButton
+                android:id="@+id/tgl_btn_cam_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                style="@style/toggleButton"
+                android:background="?android:selectableItemBackground"
+                />
+
+            <ImageButton
+                android:id="@+id/img_btn_cam_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="299dp"
+                android:layout_marginEnd="187dp"
+                android:background="?android:selectableItemBackground"
+                app:srcCompat="@drawable/camera_switch_back"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -42,38 +78,40 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:onClick="scan"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:paddingTop="4dp"
-                android:paddingRight="4dp"
-                android:text="SCAN"
-                app:backgroundTint="#009900" />
+                android:paddingEnd="4dp"
+                android:text="@string/start"
+                app:backgroundTint="#3F51B5"
+                tools:ignore="NestedWeights" />
 
             <Spinner
                 android:id="@+id/resolution_spinner_cv"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#DDB3B3"
+                android:layout_weight="2"
+                android:background="#009688"
                 android:dropDownSelector="@color/teal_700"
-                android:paddingLeft="4dp"
+                android:paddingStart="4dp"
                 android:paddingTop="4dp"
-                android:paddingRight="8dp"></Spinner>
+                android:paddingEnd="8dp" />
 
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linear_layout_of_texture"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
+            android:layout_weight="4"
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/imageView2"
+                android:id="@+id/imageView_walking_standing"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:layout_column="1"
-                android:src="@drawable/walking" />
+                android:src="@drawable/walking"
+                tools:ignore="ContentDescription" />
 
             <TableLayout
                 android:layout_width="wrap_content"
@@ -84,40 +122,46 @@
                     android:layout_height="105dp">
 
                     <TextView
-                        android:id="@+id/TextNumber1"
+                        android:id="@+id/txt_capacity"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_column="1"
-                        android:paddingLeft="30dp"
+                        android:inputType="number"
+                        android:paddingStart="30dp"
                         android:paddingTop="30dp"
                         android:text=""
                         android:textAlignment="center"
                         android:textColor="#FFFFFF"
-                        android:textSize="30sp" />
+                        android:textSize="30sp"
+                        tools:ignore="RtlSymmetry,TextViewEdits" />
 
                     <TextView
-                        android:id="@+id/TextNumber2"
+                        android:id="@+id/txt_current"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_column="2"
-                        android:paddingLeft="30dp"
+                        android:inputType="number"
+                        android:paddingStart="30dp"
                         android:paddingTop="30dp"
                         android:text=""
                         android:textAlignment="center"
                         android:textColor="#FFFFFF"
-                        android:textSize="30sp" />
+                        android:textSize="30sp"
+                        tools:ignore="RtlSymmetry,TextViewEdits" />
 
                     <TextView
-                        android:id="@+id/TextNumber3"
+                        android:id="@+id/txt_to_enter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_column="3"
-                        android:paddingLeft="30dp"
+                        android:inputType="number"
+                        android:paddingStart="30dp"
                         android:paddingTop="30dp"
                         android:text=""
                         android:textAlignment="center"
                         android:textColor="#FFFFFF"
-                        android:textSize="30sp" />
+                        android:textSize="30sp"
+                        tools:ignore="RtlSymmetry,TextViewEdits" />
                 </TableRow>
 
                 <TableRow
@@ -129,10 +173,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_column="1"
-                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp"
                         android:paddingTop="10dp"
                         android:paddingEnd="10dp"
-                        android:text="@string/Kapasite"
+                        android:text="@string/capacity"
                         android:textColor="#FFFFFF" />
 
                     <TextView
@@ -140,10 +184,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_column="2"
-                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp"
                         android:paddingTop="10dp"
                         android:paddingEnd="10dp"
-                        android:text="@string/Mevcut"
+                        android:text="@string/current"
                         android:textColor="#FFFFFF" />
 
                     <TextView
@@ -151,10 +195,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_column="3"
-                        android:paddingLeft="10dp"
+                        android:paddingStart="10dp"
                         android:paddingTop="10dp"
                         android:paddingEnd="10dp"
-                        android:text="@string/girebilir"
+                        android:text="@string/enter"
                         android:textColor="#FFFFFF" />
 
                 </TableRow>
@@ -163,14 +207,17 @@
 
             <TextureView
                 android:id="@+id/textureView"
-                android:layout_width="400dp"
-                android:layout_height="400dp"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
                 android:visibility="visible" />
+
 
         </LinearLayout>
 
 
     </LinearLayout>
+
+
 
 
 </LinearLayout>

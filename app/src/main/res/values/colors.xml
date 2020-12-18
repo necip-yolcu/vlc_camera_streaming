@@ -11,4 +11,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorExternalCamera">#009688</color>
+    <color name="colorInternalCamera">#FF9800</color>
+
+    <!--
+    <color name="disable_forground_grey">#FF4081</color>
+    <color name="disable_thumb_grey">#FF4081</color>     -->
+    <color name="enable_thumb_green">#FF4081</color>
 </resources>
