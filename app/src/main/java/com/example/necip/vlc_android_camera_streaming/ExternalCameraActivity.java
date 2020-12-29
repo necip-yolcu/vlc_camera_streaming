@@ -33,8 +33,8 @@ public class ExternalCameraActivity extends AppCompatActivity {
     String ip_command;// = "/1";
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     SwitchCompat switch1, switch2;
-    TextView txt_weblink;
-    LinearLayout linearLayout_option_1, linearLayout_option_2;
+    TextView txt_weblink, txt_id_res;
+    LinearLayout linearLayout_option_1, linearLayout_option_2, linearLayout_id_res1, linearLayout_id_res2;
 
     @SuppressLint({"SetTextI18n", "ResourceType"})
     @Override
@@ -51,6 +51,8 @@ public class ExternalCameraActivity extends AppCompatActivity {
         linearLayout_option_2 = findViewById(R.id.linearLayout_option_2);
         linearLayout_option_1.setVisibility(View.GONE);
         linearLayout_option_2.setVisibility(View.GONE);
+        linearLayout_id_res1 = findViewById(R.id.linearLayout_id_res1);
+        linearLayout_id_res2 = findViewById(R.id.linearLayout_id_res2);
 
         textRTSP = findViewById(R.id.textRTSPUrl);
 
@@ -92,6 +94,8 @@ public class ExternalCameraActivity extends AppCompatActivity {
         command_input = findViewById(R.id.command_input);
         //command_input.setText("/1");
 
+        txt_id_res = findViewById(R.id.txt_id_res);
+
         txt_weblink = findViewById(R.id.txt_weblink);
         txt_weblink.setMovementMethod(LinkMovementMethod.getInstance());
         txt_weblink.setOnClickListener(v -> {
@@ -111,53 +115,93 @@ public class ExternalCameraActivity extends AppCompatActivity {
                 Spinner spinner = (Spinner) parent;
                 String item = (String) spinner.getSelectedItem();
                 switch (item) {
-                    case "1920x1080":
+                    case "1920x1080 (16:9)":
                         width = 1920;
                         height = 1080;
                         break;
-                    case "1080x1920":
-                        width = 1080;
-                        height = 1920;
-                        break;
-                    case "1280x720":
+                    case "1280x720 (16:9)":
                         width = 1280;
                         height = 720;
                         break;
-                    case "720x1280":
-                        width = 720;
-                        height = 1280;
+                    case "1024x576 (16:9)":
+                        width = 1024;
+                        height = 576;
                         break;
-                    case "800x600":
+                    case "960x540 (16:9)":
+                        width = 960;
+                        height = 540;
+                        break;
+                    case "848x480 (16:9)":
+                        width = 848;
+                        height = 480;
+                        break;
+                    case "720x405 (16:9)":
+                        width = 720;
+                        height = 405;
+                        break;
+                    case "640x360 (16:9)":
+                        width = 640;
+                        height = 360;
+                        break;
+                    case "480x270 (16:9)":
+                        width = 480;
+                        height = 270;
+                        break;case "320x180 (16:9)":
+                        width = 320;
+                        height = 180;
+                        break;
+                    case "240x135 (16:9)":
+                        width = 240;
+                        height = 135;
+                        break;
+                    case "160x90 (16:9)":
+                        width = 160;
+                        height = 90;
+                        break;
+
+                    case "1920x1440 (4:3)":
+                        width = 1920;
+                        height = 1440;
+                        break;
+                    case "1440x1080 (4:3)":
+                        width = 1440;
+                        height = 1080;
+                        break;
+                    case "1280x960 (4:3)":
+                        width = 1280;
+                        height = 960;
+                        break;
+                    case "1024x768 (4:3)":
+                        width = 1024;
+                        height = 768;
+                        break;
+                    case "960x720 (4:3)":
+                        width = 960;
+                        height = 720;
+                        break;
+                    case "800x600 (4:3)":
                         width = 800;
                         height = 600;
                         break;
-                    case "600x800":
-                        width = 600;
-                        height = 800;
+                    case "720x540 (4:3)":
+                        width = 720;
+                        height = 540;
                         break;
-                    case "640x480":
+                    case "640x480 (4:3)":
                         width = 640;
                         height = 480;
                         break;
-                    case "480x640":
+                    case "480x360 (4:3)":
                         width = 480;
-                        height = 640;
+                        height = 360;
                         break;
-                    case "320x240":
+                    case "320x240 (4:3)":
                         width = 320;
                         height = 240;
                         break;
-                    case "240x320":
-                        width = 240;
-                        height = 320;
-                        break;
-                    case "176x144":
-                        width = 176;
-                        height = 144;
-                        break;
-                    case "144x176":
-                        width = 144;
-                        height = 176;
+                    case "160x120 (4:3)":
+                        width = 160;
+                        height = 120;
                         break;
                 }
                 width_input.setText(String.valueOf(width));
@@ -314,6 +358,14 @@ public class ExternalCameraActivity extends AppCompatActivity {
                 if (switch1.isChecked()) {
                     linearLayout_option_1.setVisibility(View.VISIBLE);
                     linearLayout_option_2.setVisibility(View.GONE);
+                    if (txt_id_res.getParent() == linearLayout_option_2) {
+                        linearLayout_option_2.removeView(txt_id_res);
+                        linearLayout_option_2.removeView(linearLayout_id_res1);
+                        linearLayout_option_2.removeView(linearLayout_id_res2);
+                        linearLayout_option_1.addView(txt_id_res);
+                        linearLayout_option_1.addView(linearLayout_id_res1);
+                        linearLayout_option_1.addView(linearLayout_id_res2);
+                    }
                 } else {
                     linearLayout_option_1.setVisibility(View.GONE);
                 }
@@ -324,6 +376,14 @@ public class ExternalCameraActivity extends AppCompatActivity {
                 if (switch2.isChecked()) {
                     linearLayout_option_1.setVisibility(View.GONE);
                     linearLayout_option_2.setVisibility(View.VISIBLE);
+                    if (txt_id_res.getParent() == linearLayout_option_1) {
+                        linearLayout_option_1.removeView(txt_id_res);
+                        linearLayout_option_1.removeView(linearLayout_id_res1);
+                        linearLayout_option_1.removeView(linearLayout_id_res2);
+                        linearLayout_option_2.addView(txt_id_res);
+                        linearLayout_option_2.addView(linearLayout_id_res1);
+                        linearLayout_option_2.addView(linearLayout_id_res2);
+                    }
                 } else {
                     linearLayout_option_2.setVisibility(View.GONE);
                 }

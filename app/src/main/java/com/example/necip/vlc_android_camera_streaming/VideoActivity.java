@@ -1,66 +1,87 @@
 package com.example.necip.vlc_android_camera_streaming;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.ColorDrawable;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceDetection;
+import com.google.mlkit.vision.face.FaceDetector;
+import com.google.mlkit.vision.face.FaceDetectorOptions;
+import com.google.mlkit.vision.face.FaceLandmark;
 
+import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
+import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import org.opencv.objdetect.CascadeClassifier;
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class VideoActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener, CameraBridgeViewBase.CvCameraViewListener2 {
 
@@ -68,9 +89,9 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
     private TextureView textureView;
     private ImageView imageView;
-    ToggleButton tgl_btn_cam_switch;
-    ImageButton img_btn_cam_switch;
-
+    ImageButton img_btn_cam_switch, img_btn_cam_res;
+    FaceDetectorOptions highAccuracyOpts, realTimeOpts, realTimeMultiOpts;
+    android.graphics.Rect bounds;
 
     // media player
     private LibVLC libvlc;
@@ -84,10 +105,13 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
     String scan_command;
 
-    boolean img_btn, flag;
+    ArrayAdapter<String> arrayAdapter;
+    ArrayList<Integer> arrayListForWidth, arrayListForHeight;
+
+    boolean img_btn1, flag, motion_detection, face_detection, no_scanning;
     Bitmap b, b1, b2;
 
-    Mat avg = null;
+    Mat avg;
     Mat imageMat, firstframe, grayMat, accWght, cnvrtScal, frameDelta, cannyEdges, thresh;
 
 
@@ -96,6 +120,9 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     ArrayList<Rect> arr;        //xvalues, yvalues, w, h
     List<Integer> xvalues = new ArrayList<>();
     List<Integer> motion = new ArrayList<>();
+    List<Integer> rect_left_x_values = new ArrayList<>();
+    List<Integer> rect_right_x_values = new ArrayList<>();
+    List<Integer> motion2 = new ArrayList<>();
     //List<Integer> xvalues;
     //List<Integer> motion;
 
@@ -104,12 +131,15 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     int kapasite = 3;
     TextView txt_capacity, txt_current, txt_to_enter;
 
-    Spinner resolution_spinner_cv;
-    LinearLayout video_linearLayout, linear_layout_of_texture;
+    Spinner resolution_spinner_cv, resolution_spinner;
+    LinearLayout video_linearLayout, linear_layout_of_texture, linearLayout_option_3;
     ImageView imageView_walking_standing;
+
+    private CascadeClassifier cascadeClassifier;
 
     // android camera
     CameraBridgeViewBase cameraBridgeViewBase;
+    BaseLoaderCallback baseLoaderCallback;
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_CODE = 200;
@@ -117,6 +147,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     final Handler handler = new Handler();
     final int updateFreqMs = 30; //30; 1000// call update every 1000 ms 1000/fps
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,39 +159,206 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         linear_layout_of_texture = findViewById(R.id.linear_layout_of_texture);
         imageView_walking_standing = findViewById(R.id.imageView_walking_standing);
 
+
         textureView = findViewById(R.id.textureView);
-        //textureView.setSurfaceTextureListener(this);
-        //textureView.setSurfaceTextureListener(null);
 
         imageView = findViewById(R.id.imageView);
 
-        img_btn = true;
+        //PERMISSION
+        checkCameraPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
+        //checkStoragePermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE_PERMISSION_CODE);
+
+        // Check if Google Play Services is installed and its version is at least 20.12.14
+        /// On Android 8.1 Go devices ML Kit requires at least version 20.12.14 to be able to download models properly without a reboot
+        int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this, 201214000);
+        if (result != ConnectionResult.SUCCESS) {
+            if (GoogleApiAvailability.getInstance().isUserResolvableError(result)) {
+                GoogleApiAvailability.getInstance().getErrorDialog(this, result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            }
+        }
+
+        ///android camera CV
+        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        cameraBridgeViewBase = (JavaCameraView)findViewById(R.id.myAndroidCameraView);
+        //cameraBridgeViewBase.setAlpha(0);
+
+        baseLoaderCallback = new BaseLoaderCallback(this) {
+            @Override
+            public void onManagerConnected(int status) {
+                super.onManagerConnected(status);
+                switch(status){
+                    case BaseLoaderCallback.SUCCESS:
+                        try {
+                            InputStream is = getResources().openRawResource(R.raw.haarcascade_frontalface_default);
+                            File cascadeDir = getDir("haarcascade_frontalface_default", Context.MODE_PRIVATE);
+                            File mCascadeFile = new File(cascadeDir, "haarcascade_frontalface_default.xml");
+                            FileOutputStream os = new FileOutputStream(mCascadeFile);
+
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = is.read(buffer)) != -1)
+                                os.write(buffer, 0, bytesRead);
+                            is.close();
+                            os.close();
+                            // Load the cascade classifier
+                            cascadeClassifier = new CascadeClassifier(mCascadeFile.getAbsolutePath());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.e("OpenCVActivity", "Error loading cascade", e);
+                        }
+                        //cameraBridgeViewBase.enableView();
+                        break;
+                    default:
+                        super.onManagerConnected(status);
+                        break;
+                }
+            }
+        };
+
+
+        AtomicInteger cam_index_no = new AtomicInteger();
+        img_btn1 = true;
         img_btn_cam_switch = findViewById(R.id.img_btn_cam_switch);
         img_btn_cam_switch.setOnClickListener(view -> {
-            if (img_btn) {
-                img_btn = false;
+            if (img_btn1) {
                 cameraBridgeViewBase.disableView();
                 cameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
                 cameraBridgeViewBase.enableView();
+                img_btn1 = false;
+
+
+                firstframe.release();
+                avg.release();
+                grayMat.release();
+                accWght.release();
+                cnvrtScal.release();
+                frameDelta.release();
+                cannyEdges.release();
+                thresh.release();
+
+                firstframe = new Mat();
+                avg = new Mat();
+                grayMat = new Mat();
+                accWght = new Mat();
+                cnvrtScal = new Mat();
+                frameDelta = new Mat();
+                cannyEdges = new Mat();
+                thresh = new Mat();
+                arr = new ArrayList<>();
+
+                cam_index_no.set(1); //CAMERA_FACING_FRONT
             } else {
-                img_btn = true;
                 cameraBridgeViewBase.disableView();
                 cameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_BACK);
                 cameraBridgeViewBase.enableView();
+                img_btn1 = true;
+
+                firstframe.release();
+                avg.release();
+                grayMat.release();
+                accWght.release();
+                cnvrtScal.release();
+                frameDelta.release();
+                cannyEdges.release();
+                thresh.release();
+
+                firstframe = new Mat();
+                avg = new Mat();
+                grayMat = new Mat();
+                accWght = new Mat();
+                cnvrtScal = new Mat();
+                frameDelta = new Mat();
+                cannyEdges = new Mat();
+                thresh = new Mat();
+                arr = new ArrayList<>();
+
+                cam_index_no.set(0); //CAMERA_FACING_BACK
             }
+
         });
 
-        tgl_btn_cam_switch = findViewById(R.id.tgl_btn_cam_switch);
-        tgl_btn_cam_switch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if (isChecked) {
-                cameraBridgeViewBase.disableView();
-                cameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
-                cameraBridgeViewBase.enableView();
-            } else {
-                cameraBridgeViewBase.disableView();
-                cameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_BACK);
-                cameraBridgeViewBase.enableView();
+        List<ArrayAdapter<String>> lst_of_array_list = new ArrayList<>();
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add(String.valueOf(arrayAdapter));
+        arrayList.get(0);
+
+        arrayListForWidth = new ArrayList<>();
+        arrayListForHeight = new ArrayList<>();
+
+        List list;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            for (int index = 0; index < 2; index++) {  //index=0 means CAMERA__BACK, =1 means _FRONT
+                Camera cam_index = Camera.open(index);
+                if (cam_index.getParameters().getSupportedVideoSizes() != null) {
+                    arrayAdapter = new ArrayAdapter<String>(VideoActivity.this,
+                            android.R.layout.select_dialog_singlechoice) {
+                        @Override
+                        public View getView(int position, View convertView, ViewGroup parent) {
+                            TextView textView = (TextView) super.getView(position, convertView, parent);
+                            textView.setTextColor(Color.WHITE);
+                            return textView;
+                        }
+                    };
+                    list = cam_index.getParameters().getSupportedVideoSizes();
+                    for (Object i : list) {
+                        arrayAdapter.addAll(((Camera.Size) i).width + "x" + ((Camera.Size) i).height);
+                        arrayListForWidth.add(((Camera.Size) i).width);
+                        arrayListForHeight.add(((Camera.Size) i).height);
+                        Log.d("camera1: ", ((Camera.Size) i).width + " x " + ((Camera.Size) i).height);
+                    }
+                    lst_of_array_list.add(index, arrayAdapter);
+                }
             }
+        }
+
+        final int[] checkedItem = {0}; //arrayAdapter.getCount() - 1; son olan
+        img_btn_cam_res = findViewById(R.id.img_btn_cam_res);
+        img_btn_cam_res.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onClick(View view) {
+                //dialog appear
+                img_btn_cam_res.setImageDrawable(getResources().getDrawable(R.drawable.setting_purple_48));
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this, R.style.AlertDialogCustom);
+                //AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
+                builder.setCancelable(false);
+                builder.setTitle("Çözünürlük Seçiniz");
+                builder.setSingleChoiceItems(lst_of_array_list.get(cam_index_no.get()), checkedItem[0], new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        checkedItem[0] = i;
+                        cameraBridgeViewBase.setMaxFrameSize(arrayListForWidth.get(i), arrayListForHeight.get(i));
+                        cameraBridgeViewBase.disableView();
+                        cameraBridgeViewBase.enableView();
+                        Toast.makeText(VideoActivity.this, "Çözünürlük:  " +
+                                arrayListForWidth.get(i) + "x" + arrayListForHeight.get(i), Toast.LENGTH_LONG).show();
+                        dialogInterface.dismiss();
+                        img_btn_cam_res.setImageDrawable(getResources().getDrawable(R.drawable.setting_white_48));
+                    }
+                });
+                builder.setNegativeButton("İptal", (dialogInterface, i) -> {
+                    img_btn_cam_res.setImageDrawable(getResources().getDrawable(R.drawable.setting_white_48));
+                });
+                AlertDialog dialog = builder.create();
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#809b9e90")));
+                dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#500099"));
+
+                // make alert dialog fill 50% of screen
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int displayWidth = displayMetrics.widthPixels;
+                int displayHeight = displayMetrics.heightPixels;
+                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                layoutParams.copyFrom(dialog.getWindow().getAttributes());
+                int dialogWindowWidth = (int) (displayWidth * 0.5f);
+                int dialogWindowHeight = (int) (displayHeight * 0.5f);
+                layoutParams.width = dialogWindowWidth;
+                layoutParams.height = dialogWindowHeight;
+                dialog.getWindow().setAttributes(layoutParams);
+            }
+
         });
 
         ArrayAdapter<CharSequence> adapter3 =
@@ -175,17 +373,27 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                 Spinner spinner2 = (Spinner) parent;
                 String item2 = (String) spinner2.getSelectedItem();
                 switch (item2) {
-                    case "Motion Detection 1":
+                    case "Hareket Algılama":
                         scan_command = "1";
+                        Log.d("herec", "MotionDetect clicked");
+                        no_scanning = false;
+                        face_detection = false;
+                        motion_detection = true;
                         break;
-                    case "Motion Detection 2":
+                    case "Yüz Algılama":
                         scan_command = "2";
+                        Log.d("herec", "FaceDetect clicked");
+                        no_scanning = false;
+                        motion_detection = false;
+                        face_detection = true;
+                        face_builder();
                         break;
-                    case "Face Detection":
+                    case "Tarama Yok":
                         scan_command = "3";
-                        break;
-                    case "No Scanning":
-                        scan_command = "4";
+                        Log.d("herec", "No scannning clicked");
+                        motion_detection = false;
+                        face_detection = false;
+                        no_scanning = true;
                         break;
                 }
                 //command_input.setText(String.valueOf(ip_command));
@@ -202,28 +410,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         txt_to_enter = findViewById(R.id.txt_to_enter);
         txt_to_enter.setText(String.valueOf(kapasite - giris));
 
-
-        ///android camera CV
-        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        cameraBridgeViewBase = (JavaCameraView)findViewById(R.id.myAndroidCameraView);
-        //cameraBridgeViewBase.setAlpha(0);
-
-        /*
-        baseLoaderCallback = new BaseLoaderCallback(this) {
-            @Override
-            public void onManagerConnected(int status) {
-                super.onManagerConnected(status);
-                switch(status){
-                    case BaseLoaderCallback.SUCCESS:
-                        cameraBridgeViewBase.enableView();
-                        break;
-                    default:
-                        super.onManagerConnected(status);
-                        break;
-                }
-            }
-        };
-         */
 
         // Get URL
         Intent intent = getIntent();
@@ -245,7 +431,22 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
                 imageView.setVisibility(View.VISIBLE);
 
-                tgl_btn_cam_switch.setVisibility(View.GONE);
+                img_btn_cam_switch.setVisibility(View.GONE);
+                img_btn_cam_res.setVisibility(View.GONE);
+
+
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            UpdateExternal();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Oynatma hatası!", Toast.LENGTH_SHORT).show();
+                        }
+                        handler.postDelayed(this, updateFreqMs);
+                    }
+                }, updateFreqMs);
 
 
             } else if (str_data.equals("From MainActivity Internal-Button")) {
@@ -255,88 +456,54 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                 cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
                 cameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_BACK);
                 cameraBridgeViewBase.setCvCameraViewListener(this);
+                cameraBridgeViewBase.setMaxFrameSize(320, 240);
+                //cameraBridgeViewBase.setMaxFrameSize(480, 320);
                 cameraBridgeViewBase.enableView();
+                if (!OpenCVLoader.initDebug())
+                    OpenCVLoader.initDebug();
 
                 textureView.setSurfaceTextureListener(null);
                 textureView.setVisibility(View.GONE);
 
                 imageView.setVisibility(View.GONE);
 
-                tgl_btn_cam_switch.setVisibility(View.VISIBLE);
-
-
-                cameraBridgeViewBase.setScaleX(-1);
-                cameraBridgeViewBase.setScaleY(-1);
+                img_btn_cam_switch.setVisibility(View.VISIBLE);
+                img_btn_cam_res.setVisibility(View.VISIBLE);
 
 
             }
         }
-
-        /*
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            rtspUrl = extras.getString(rtspUrl);
-            Toast.makeText(this, "URL: " + rtspUrl, Toast.LENGTH_SHORT).show();
-        }
-         */
 
         SharedPreferences preferences = getSharedPreferences("SAVED_VALUES", MODE_PRIVATE);
         width = preferences.getInt("width", width);
         height = preferences.getInt("height", height);
-
-
-        //PERMISSION
-        checkCameraPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
-        checkStoragePermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE_PERMISSION_CODE);
-
-        // Check if Google Play Services is installed and its version is at least 20.12.14
-        /// On Android 8.1 Go devices ML Kit requires at least version 20.12.14 to be able to download models properly without a reboot
-        int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this, 201214000);
-        if (result != ConnectionResult.SUCCESS) {
-            if (GoogleApiAvailability.getInstance().isUserResolvableError(result)) {
-                GoogleApiAvailability.getInstance().getErrorDialog(this, result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            }
-        }
+        //
 
     }
-
-    /*
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(cameraBridgeViewBase!=null){
-            cameraBridgeViewBase.disableView();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!OpenCVLoader.initDebug())
-            Toast.makeText(getApplicationContext(), "There is a problem in OpenCV", Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(getApplicationContext(), "it works", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (cameraBridgeViewBase != null) {
-            cameraBridgeViewBase.disableView();
-        }
-    }
-     */
 
     public void checkCameraPermission(String permission, int requestCode) {
-        if (ContextCompat.checkSelfPermission(VideoActivity.this, permission) == PackageManager.PERMISSION_DENIED)
-            if (ActivityCompat.shouldShowRequestPermissionRationale(VideoActivity.this, permission)) {
+        /*
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED)
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
                 Log.v(TAG, "Permission is revoked");
             } else {
                 Log.v(TAG, "Permission is granted");
-                ActivityCompat.requestPermissions(VideoActivity.this, new String[]{permission}, requestCode);
+                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
             }
         else
             Log.v(TAG,"Permission is granted");
+         */
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (this.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
+                Log.v(TAG, "Permission is granted");
+            } else {
+                Log.v(TAG, "Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG,"Permission is granted");
+        }
     }
 
     public void checkStoragePermission(String permission, int requestCode) {
@@ -458,86 +625,126 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
             //Toast.makeText(this, "android sürüm: "+android.os.Build.VERSION.SDK_INT, Toast.LENGTH_SHORT).show();
 
-            /*
-            //set first frame
-            firstframe = new Mat();
-            grayMat = new Mat();
-            accWght = new Mat();
-            cnvrtScal = new Mat();
-            frameDelta = new Mat();
-            cannyEdges = new Mat();
-            thresh = new Mat();
-
-            arr = new ArrayList<>();
-             */
-
-
         } catch (Exception e) {
             Toast.makeText(this, "Error creating player!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void scan(View v) {
-        Log.d("here", "scan");
-        handler.postDelayed(new Runnable() {
+    public void face_builder() {
+        // High-accuracy landmark detection and face classification
+        highAccuracyOpts =
+                new FaceDetectorOptions.Builder()
+                        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
+                        .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+                        .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+                        .build();
+
+        // Real-time contour detection
+        realTimeOpts =
+                new FaceDetectorOptions.Builder()
+                        .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+                        .build();
+
+        // Real-time contour detection of multiple faces
+        realTimeMultiOpts =
+                new FaceDetectorOptions.Builder()
+                        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+                        .setContourMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+                        .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_NONE)
+                        .build();
+
+        // For face detection, you should use an image with dimensions of at least 480x360 pixels.
+        // If you are detecting faces in real time, capturing frames at this minimum resolution can help reduce latency.
+    }
+
+    public void face_detect_android_build(Bitmap bitmap) {
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
+        FaceDetector detector = FaceDetection.getClient(realTimeOpts);
+
+        //Task<List<Face>> result = detector.process(image....)
+        detector.process(image).addOnSuccessListener(new OnSuccessListener<List<Face>>() {
             @Override
-            public void run() {
-                try {
-                    if (from_external) {
-                        //cameraBridgeViewBase.disableView();
-                        Log.d("here", "from external");
-                        UpdateCannyEdge();
-                    } else if (from_internal) {
-                        //cameraBridgeViewBase.enableView();
-                        Log.d("here", "from internal");
+            public void onSuccess(List<Face> faces) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        for (Face face : faces) {
+                            bounds = face.getBoundingBox();
+                            float rotY = face.getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
+                            float rotZ = face.getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
+
+                            // If landmark detection was enabled (mouth, ears, eyes, cheeks, and
+                            // nose available):
+                            FaceLandmark leftEar = face.getLandmark(FaceLandmark.LEFT_EAR);
+                            if (leftEar != null) {
+                                PointF leftEarPos = leftEar.getPosition();
+                            }
+
+                            //// If contour detection was enabled:
+                            //List<PointF> leftEyeContour = face.getContour(FaceContour.LEFT_EYE).getPoints();
+                            //List<PointF> upperLipBottomContour = face.getContour(FaceContour.UPPER_LIP_BOTTOM).getPoints();
+
+                            // If classification was enabled:
+                            if (face.getSmilingProbability() != null) {
+                                float smileProb = face.getSmilingProbability();
+                            }
+                            if (face.getRightEyeOpenProbability() != null) {
+                                float rightEyeOpenProb = face.getRightEyeOpenProbability();
+                            }
+
+                            // If face tracking was enabled:
+                            if (face.getTrackingId() != null) {
+                                int id = face.getTrackingId();
+                            }
+
+                            //openCV_per_face(imageMat, bounds);
+                        }
+
+                        OpenCV_3();
+                        MatToBitmap_setImageBitmap();
+
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Oynatma hatası!", Toast.LENGTH_SHORT).show();
-                }
-                handler.postDelayed(this, updateFreqMs);
+                });
+
             }
-        }, updateFreqMs);
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("here", "failure");
+                //Task failed
+            }
+        });
 
     }
 
-    public void UpdateCannyEdge() {
+    public void UpdateExternal() {
         //b = textureView.getBitmap(textureView.getWidth(),textureView.getHeight());
         b = textureView.getBitmap(width, height);
-        Log.d("here", "UpdateCannyEdge: " + width + "-" + height + b);
+        Log.d("here", "UpdateExternal: " + width + "-" + height + b);
+
+        if (imageMat != null)
+            imageMat.release();
 
         // Bitmap to Mat
         imageMat = new Mat(b.getHeight(), b.getWidth(), CvType.CV_8UC1);
         b1 = b.copy(Bitmap.Config.ARGB_8888, true);
         Utils.bitmapToMat(b1, imageMat);
 
-
-        //OPENCV 1
-        OpenCV_1();
-
-        //OPENCV 2
-        //OpenCV_2();
-
-        // Mat to Bitmap
-        MatToBitmap_setImageBitmap();
-
-        /* frame kaybolmasıok donuyor
-        b = textureView.getBitmap(textureView.getWidth(),textureView.getHeight());
-        if (!detector.isOperational()) {
-            //Handle contingency
-        } else {
-            frame2 = new Frame.Builder().setBitmap(b).build();
-            mFaces = detector.detect(frame2);
-            detector.release();
+        if (motion_detection) {
+            OpenCV_motion_detection();
+            MatToBitmap_setImageBitmap();
         }
-        //invalidate();
-        runOnUiThread(new Runnable() {  //buna gerek var mı
-            @Override
-            public void run() {
-                imageView.setImageBitmap(b);
-            }
-        });
-         */
+
+        if (face_detection) {
+            //face_detect(b);
+            OpenCV_face_detect_haarcascade();
+            MatToBitmap_setImageBitmap();
+        }
+
+        if (no_scanning)
+            MatToBitmap_setImageBitmap();
 
     }
 
@@ -550,8 +757,39 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         runOnUiThread(() -> imageView.setImageBitmap(b2));   //buna gerek var mı
     }
 
+    public void OpenCV_face_detect_haarcascade() {
+        flag = true;
+        Log.d("face", "1");
+        Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.GaussianBlur(grayMat, grayMat, new Size(21,21), 0);
+        MatOfRect haarcascade = new MatOfRect();
+        if (cascadeClassifier != null) {
+            Log.d("face", "2");
+            cascadeClassifier.detectMultiScale(grayMat, haarcascade, 1.1, 3, 3, new Size(30,30));
+        }
+
+        Rect[] haarcascadeArray = haarcascade.toArray();
+
+        for (Rect rect1 : haarcascadeArray) {
+            int xd1 = (int) rect1.tl().x;
+            int yd1 = (int) rect1.tl().y;
+            int xd2 = (int) rect1.br().x;
+            int yd2 = (int) rect1.br().y;
+            xvalues.add(xd1);
+
+            //int center_x = (xd1 + xd2)/2;
+            //int center_y = (yd1 + yd2)/2;
+            Imgproc.rectangle(imageMat, rect1.tl(), rect1.br(), new Scalar(0,0,255), 2);
+            //Imgproc.drawMarker(imageMat, new Point(center_x, center_y), new Scalar(255,0,0));
+            Rect roi = new Rect(xd1, yd1, xd2-xd1, yd2-yd1);
+            flag = false;
+        }
+
+        OpenCV_counting(xvalues, flag);
+    }
+
     @SuppressLint({"SetTextI18n"})
-    private void OpenCV_1() {
+    private void OpenCV_motion_detection() {
         flag = true;
         contourList = new ArrayList<>(); //A list to store all the contours
 
@@ -559,11 +797,13 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         Imgproc.GaussianBlur(grayMat, grayMat, new Size(21,21), 0);
         //Imgproc.Canny(imageMat, cannyEdges, 10, 100);
 
-        //avg = grayMat.clone();
-        if (avg == null) {
-            avg = grayMat.clone();
-            avg.convertTo(avg, CvType.CV_32F);
+        if (avg.empty()) {
+            //avg = grayMat.clone();
+            grayMat.convertTo(avg, CvType.CV_32F);
         }
+
+        if (avg == null || avg.empty())
+            Log.d("here", "avg escaped");
 
         Imgproc.accumulateWeighted(grayMat, avg, 0.5);
         Core.convertScaleAbs(avg, cnvrtScal);
@@ -586,6 +826,11 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             }
         }
 
+        OpenCV_counting(xvalues, flag);
+
+    }
+
+    public void OpenCV_counting(List<Integer> xvalues, boolean flag) {
         int no_x = xvalues.size();
         if (no_x > 2) {
             int difference = xvalues.get(no_x - 1) - xvalues.get(no_x - 2);
@@ -598,8 +843,8 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         if (flag) {
             if (no_x > 5) {
                 int[] find_maj = majority(motion);
-                if((find_maj[0] == 1) && find_maj[1] >= 15)
-                    //if(find_maj[0] == 1)
+                //if((find_maj[0] == 1) && find_maj[1] >= 15)
+                if(find_maj[0] == 1)
                     giris += 1;
                 else
                     cikis += 1;
@@ -608,12 +853,30 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             motion.clear();
         }
 
-        Imgproc.line(imageMat, new Point(imageMat.width()/2, 0), new Point(imageMat.width()/2, imageMat.height()), new Scalar(255, 0, 0), 2);   //frame.width()/2 = 160, frame.height() = 720
-        Imgproc.putText(imageMat, String.format("Giris: %s", giris), new Point(imageMat.width()/2 + 10, 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
+        Imgproc.line(imageMat, new Point(imageMat.width()/2.0, 0), new Point(imageMat.width()/2.0, imageMat.height()), new Scalar(255, 0, 0), 2);   //frame.width()/2 = 160, frame.height() = 720
+        Imgproc.putText(imageMat, String.format("Giris: %s", giris), new Point(imageMat.width()/2.0 + 10, 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
         Imgproc.putText(imageMat, String.format("Cikis: %s", cikis), new Point(10, 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 0, 255), 2);
 
         runOnUiThread(() -> Update_Text(giris));
+    }
 
+    private int[] majority(List<Integer> motion) {
+        Map<Integer, Integer> myMap = new HashMap<>();
+        int[] maximum = new int[]{0,0};
+
+        for (int n : motion) {
+            //if (myMap.get(n) == null) continue;  //not sure about that ..
+            if (myMap.containsKey(n)) {
+                myMap.put(n, myMap.get(n) + 1);
+            } else
+                myMap.put(n, 1);
+
+            if (myMap.get(n) > maximum[1]){
+                maximum[0] = n;
+                maximum[1] = myMap.get(n);
+            }
+        }
+        return maximum;
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -628,18 +891,17 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     }
 
     private void OpenCV_2() {
-        Imgproc.resize(imageMat, imageMat, new Size(500, 500));
-        Mat gray = new Mat();
-        Imgproc.cvtColor(imageMat, gray, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.GaussianBlur(gray, gray, new Size(21, 21), 0);
+        Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
+        Mat grayMat = new Mat();
+        Imgproc.GaussianBlur(grayMat, grayMat, new Size(21, 21), 0);
 
         if (firstframe == null) {
-            firstframe = gray;
+            firstframe = grayMat;
             //continue;
         }
 
         Mat frameDelta = new Mat();
-        Core.absdiff(firstframe, gray, frameDelta);
+        Core.absdiff(firstframe, grayMat, frameDelta);
         Mat thresh = new Mat();
         Imgproc.threshold(frameDelta, thresh, 25, 255, Imgproc.THRESH_BINARY);
 
@@ -659,25 +921,12 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             Rect r = Imgproc.boundingRect(mf);
             Imgproc.rectangle(imageMat, r.tl(), r.br(), new Scalar(0, 255, 0), 2);
         }
-        firstframe = gray;
+        firstframe = grayMat;
     }
 
-    private int[] majority(List<Integer> motion) {
-        Map<Integer, Integer> myMap = new HashMap<>();
-        int[] maximum = new int[]{0,0};
-
-        for (int n : motion) {
-            if (myMap.containsKey(n))
-                myMap.put(n, myMap.get(n) + 1);
-            else
-                myMap.put(n, 1);
-
-            if (myMap.get(n) > maximum[1]){
-                maximum[0] = n;
-                maximum[1] = myMap.get(n);
-            }
-        }
-        return maximum;
+    private  void OpenCV_3() {
+        if (bounds != null)
+            Imgproc.rectangle(imageMat, new Point(bounds.left, bounds.top), new Point(bounds.left + bounds.width(), bounds.top + bounds.height()), new Scalar(0, 0, 255), 2);
     }
 
     @Override
@@ -703,13 +952,18 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         Log.d("here", "onResume");
         super.onResume();
 
-        if (!OpenCVLoader.initDebug())
+        if (!OpenCVLoader.initDebug()) {
             Toast.makeText(getApplicationContext(), "There is a problem in OpenCV", Toast.LENGTH_SHORT).show();
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_11, this, baseLoaderCallback); //OPENCV_VERSION_3_3_0
+        }
         else {
             Toast.makeText(getApplicationContext(), "it works", Toast.LENGTH_SHORT).show();
+            baseLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+            cameraBridgeViewBase.enableView();
 
             //set first frame
             firstframe = new Mat();
+            avg = new Mat();
             grayMat = new Mat();
             accWght = new Mat();
             cnvrtScal = new Mat();
@@ -719,28 +973,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             arr = new ArrayList<>();
 
         }
-
-
-        ///baseLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-
-        /*
-        if(textureView == null) {
-            textureView = findViewById(R.id.textureView); //????
-            linear_layout_of_texture.addView(textureView);
-        }
-
-         */
-
-
-        /*
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                UpdateCannyEdge();
-                handler.postDelayed(this, updateFreqMs);
-            }
-        }, updateFreqMs);
-         */
 
     }
 
@@ -804,14 +1036,16 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
     //AFTER THAT POINT --> ANDROID CAMERA
     @Override
-    public void onCameraViewStarted(int width, int height) { //320-240
-        //andr_mat = new Mat(width, height, CvType.CV_8UC4);
+    public void onCameraViewStarted(int width, int height) {
         Log.d("here", "onCameraViewStarted: " + width + "-" + height);
+        //imageMat = new Mat();
+        imageMat = new Mat(height, width, CvType.CV_8UC4);
     }
 
     @Override
     public void onCameraViewStopped() {
         Log.d("here", "onCameraViewStopped");
+        imageMat.release();
     }
 
     @Override
@@ -819,38 +1053,27 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         if (imageMat != null)
             imageMat.release();
         imageMat = inputFrame.rgba().t();
-        Core.flip(imageMat, imageMat, 1);
+        if (img_btn1)
+            Core.flip(imageMat, imageMat, 1);
+        else
+            Core.flip(imageMat, imageMat, -1);
         Imgproc.resize(imageMat, imageMat, inputFrame.rgba().size()); //new Size(width:.. , height: ..)
         Log.d("here", "onCameraFrame: " + inputFrame.rgba().size());
 
+        if (motion_detection)
+            OpenCV_motion_detection();
 
-        OpenCV_1();
+        if (face_detection) {
+            OpenCV_face_detect_haarcascade();
+            //
+        }
+
+        if (no_scanning) {
+        }
 
         inputFrame.rgba().release();  //buna gerek var mı???
 
         return imageMat;
-
     }
-
-    /*    for bitmap
-    private Bitmap rotateBitmap(Bitmap bitmap){
-        Matrix rotateRight = new Matrix();
-        rotateRight.preRotate(90);
-
-        float[] mirrorY = { -1, 0, 0, 0, 1, 0, 0, 0, 1};
-        rotateRight = new Matrix();
-        Matrix matrixMirrorY = new Matrix();
-        matrixMirrorY.setValues(mirrorY);
-
-        rotateRight.postConcat(matrixMirrorY);
-
-        rotateRight.preRotate(270);
-
-
-        final Bitmap rImg= Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), rotateRight, true);
-        return rImg;
-    }
-
-     */
 
 }

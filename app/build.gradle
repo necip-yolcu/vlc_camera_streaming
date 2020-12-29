@@ -45,4 +45,12 @@ dependencies {
 
     //implementation "org.videolan.android:libvlc-all:3.3.10"
 
+    // added MLKit dependencies for face detector
+    // Face Recognition  at least 480x360 pixels
+    // Contours of faces at least 200x200 pixels
+    // Face Detection    at least 100x100 pixels
+    implementation 'com.google.mlkit:face-detection:16.0.3'                             // For bundling the model in your app:
+
+    //implementation 'com.google.android.gms:play-services-mlkit-face-detection:16.1.2'   // For using model within Google Play Service:
+
 }

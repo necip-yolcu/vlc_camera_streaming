@@ -8,26 +8,23 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-
-    <Button
-        android:id="@+id/btn_internal"
+    <ImageButton
+        android:id="@+id/img_btn_internal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/colorInternalCamera"
         android:onClick="btnClickNextActivity"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:text="DAHİLİ KAMERA"
-        android:textSize="36sp"
-        app:backgroundTint="#FF9800" />
+        app:srcCompat="@drawable/and_cam" />
 
-    <Button
-        android:id="@+id/btn_external"
+    <ImageButton
+        android:id="@+id/img_btn_external"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/colorExternalCamera"
         android:onClick="btnClickNextActivity"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:text="HARİCİ KAMERA"
-        android:textSize="36sp"
-        app:backgroundTint="#009688" />
+        app:srcCompat="@drawable/ip_cam" />
+
+
 </LinearLayout>

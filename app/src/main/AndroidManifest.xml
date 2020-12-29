@@ -6,24 +6,32 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature android:name="android.hardware.camera.front" />
-    <uses-feature android:name="android.hardware.camera.front.autofocus" />
+    <uses-feature android:name="android.hardware.camera"
+        android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus"
+        android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.front"
+        android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.front.autofocus"
+        android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.back"
+        android:required="false"/>
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_camera"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:fullBackupContent="">
+        android:roundIcon="@mipmap/ic_launcher_camera"
+        android:supportsRtl="true">
+        <activity android:name=".FaceDetectionAct"
+            android:theme="@style/AppTheme" />
         <!-- android:theme="@style/AppTheme"   //buradan kaldırılıp her activity ye ayrı ayrı eklendi -->
         <activity
             android:name=".ExternalCameraActivity"

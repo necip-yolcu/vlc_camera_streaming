@@ -34,14 +34,13 @@
         <item name="android:colorForeground">#42221f1f</item>   -->
     </style>
 
-    <style name="Widget.Button.Toggle" parent="android:Widget">
-        <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
+    <style name="CustomDialog" parent="android:Theme.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <style name="toggleButton"  parent="Theme.AppCompat.DayNight">
-        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle</item>
-        <item name="android:textOn">açık</item>
-        <item name="android:textOff">kapalı</item>
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:textColor">#500099</item>
     </style>
 
 </resources>

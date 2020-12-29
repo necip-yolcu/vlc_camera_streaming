@@ -18,13 +18,14 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     public void btnClickNextActivity(View v) {
         switch (v.getId()) {
-            case R.id.btn_internal:
+            case R.id.img_btn_internal:
                 Intent intent = new Intent(this, VideoActivity.class);
                 intent.putExtra("Source", "From MainActivity Internal-Button");
                 startActivity(intent);
                 break;
-            case R.id.btn_external:
+            case R.id.img_btn_external:
                 Intent intent2 = new Intent(this, ExternalCameraActivity.class);
+                //Intent intent2 = new Intent(this, FaceDetectionAct.class);
                 startActivity(intent2);
                 break;
             default:
