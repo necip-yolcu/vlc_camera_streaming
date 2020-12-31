@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -105,6 +104,9 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
     String scan_command;
 
+    AtomicInteger cam_index_no;
+    int[] checkedItem;
+    List<ArrayAdapter<String>> lst_of_array_list;
     ArrayAdapter<String> arrayAdapter;
     ArrayList<Integer> arrayListForWidth, arrayListForHeight;
 
@@ -132,10 +134,12 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     TextView txt_capacity, txt_current, txt_to_enter;
 
     Spinner resolution_spinner_cv, resolution_spinner;
-    LinearLayout video_linearLayout, linear_layout_of_texture, linearLayout_option_3;
+    LinearLayout video_linearLayout, linear_layout_of_texture;
     ImageView imageView_walking_standing;
 
     private CascadeClassifier cascadeClassifier;
+    MatOfRect haarcascade_first;
+    Rect[] haarcascadeArray_first;
 
     // android camera
     CameraBridgeViewBase cameraBridgeViewBase;
@@ -170,12 +174,13 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
         // Check if Google Play Services is installed and its version is at least 20.12.14
         /// On Android 8.1 Go devices ML Kit requires at least version 20.12.14 to be able to download models properly without a reboot
+        /*
         int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this, 201214000);
         if (result != ConnectionResult.SUCCESS) {
             if (GoogleApiAvailability.getInstance().isUserResolvableError(result)) {
                 GoogleApiAvailability.getInstance().getErrorDialog(this, result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
             }
-        }
+        }*/
 
         ///android camera CV
         //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -215,8 +220,9 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             }
         };
 
+        camera_allow();
 
-        AtomicInteger cam_index_no = new AtomicInteger();
+        cam_index_no = new AtomicInteger();
         img_btn1 = true;
         img_btn_cam_switch = findViewById(R.id.img_btn_cam_switch);
         img_btn_cam_switch.setOnClickListener(view -> {
@@ -277,41 +283,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
         });
 
-        List<ArrayAdapter<String>> lst_of_array_list = new ArrayList<>();
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add(String.valueOf(arrayAdapter));
-        arrayList.get(0);
-
-        arrayListForWidth = new ArrayList<>();
-        arrayListForHeight = new ArrayList<>();
-
-        List list;
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            for (int index = 0; index < 2; index++) {  //index=0 means CAMERA__BACK, =1 means _FRONT
-                Camera cam_index = Camera.open(index);
-                if (cam_index.getParameters().getSupportedVideoSizes() != null) {
-                    arrayAdapter = new ArrayAdapter<String>(VideoActivity.this,
-                            android.R.layout.select_dialog_singlechoice) {
-                        @Override
-                        public View getView(int position, View convertView, ViewGroup parent) {
-                            TextView textView = (TextView) super.getView(position, convertView, parent);
-                            textView.setTextColor(Color.WHITE);
-                            return textView;
-                        }
-                    };
-                    list = cam_index.getParameters().getSupportedVideoSizes();
-                    for (Object i : list) {
-                        arrayAdapter.addAll(((Camera.Size) i).width + "x" + ((Camera.Size) i).height);
-                        arrayListForWidth.add(((Camera.Size) i).width);
-                        arrayListForHeight.add(((Camera.Size) i).height);
-                        Log.d("camera1: ", ((Camera.Size) i).width + " x " + ((Camera.Size) i).height);
-                    }
-                    lst_of_array_list.add(index, arrayAdapter);
-                }
-            }
-        }
-
-        final int[] checkedItem = {0}; //arrayAdapter.getCount() - 1; son olan
+        checkedItem = new int[]{0}; //arrayAdapter.getCount() - 1; son olan
         img_btn_cam_res = findViewById(R.id.img_btn_cam_res);
         img_btn_cam_res.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("UseCompatLoadingForDrawables")
@@ -324,19 +296,24 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                 //AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
                 builder.setCancelable(false);
                 builder.setTitle("Çözünürlük Seçiniz");
-                builder.setSingleChoiceItems(lst_of_array_list.get(cam_index_no.get()), checkedItem[0], new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        checkedItem[0] = i;
-                        cameraBridgeViewBase.setMaxFrameSize(arrayListForWidth.get(i), arrayListForHeight.get(i));
-                        cameraBridgeViewBase.disableView();
-                        cameraBridgeViewBase.enableView();
-                        Toast.makeText(VideoActivity.this, "Çözünürlük:  " +
-                                arrayListForWidth.get(i) + "x" + arrayListForHeight.get(i), Toast.LENGTH_LONG).show();
-                        dialogInterface.dismiss();
-                        img_btn_cam_res.setImageDrawable(getResources().getDrawable(R.drawable.setting_white_48));
-                    }
-                });
+                Log.d("acam", lst_of_array_list + "");
+                try {
+                    builder.setSingleChoiceItems(lst_of_array_list.get(cam_index_no.get()), checkedItem[0], new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            checkedItem[0] = i;
+                            cameraBridgeViewBase.setMaxFrameSize(arrayListForWidth.get(i), arrayListForHeight.get(i));
+                            cameraBridgeViewBase.disableView();
+                            cameraBridgeViewBase.enableView();
+                            Toast.makeText(VideoActivity.this, "Çözünürlük:  " +
+                                    arrayListForWidth.get(i) + "x" + arrayListForHeight.get(i), Toast.LENGTH_LONG).show();
+                            dialogInterface.dismiss();
+                            img_btn_cam_res.setImageDrawable(getResources().getDrawable(R.drawable.setting_white_48));
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 builder.setNegativeButton("İptal", (dialogInterface, i) -> {
                     img_btn_cam_res.setImageDrawable(getResources().getDrawable(R.drawable.setting_white_48));
                 });
@@ -496,6 +473,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         if (Build.VERSION.SDK_INT >= 23) {
             if (this.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
                 Log.v(TAG, "Permission is granted");
+
             } else {
                 Log.v(TAG, "Permission is revoked");
                 ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
@@ -526,15 +504,55 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                Toast.makeText(VideoActivity.this, "Kamera izni verildi", Toast.LENGTH_SHORT).show();
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Kamera izni verildi", Toast.LENGTH_SHORT).show();
+                camera_allow();
+            }
             else
-                Toast.makeText(VideoActivity.this, "Kamera izni reddedildi", Toast.LENGTH_SHORT).show();
-        } else if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_CODE) {
+                Toast.makeText(this, "Kamera izni reddedildi", Toast.LENGTH_SHORT).show();
+        }
+        /*else if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 Toast.makeText(VideoActivity.this, "Depolama izni verildi", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(VideoActivity.this, "Depolama izni reddedildi", Toast.LENGTH_SHORT).show();
+        }*/
+    }
+
+    public void camera_allow() {
+        try {
+            Log.d("acama", "open");
+
+            lst_of_array_list = new ArrayList<>();
+
+            arrayListForWidth = new ArrayList<>();
+            arrayListForHeight = new ArrayList<>();
+            List list;
+            int index;
+            for (int i = 0; i<2; i++) {  //index=0 means CAMERA__BACK, =1 means _FRONT
+                index = ((i == 0) ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT);
+                Camera cam_index = Camera.open(index);
+                if (cam_index.getParameters().getSupportedVideoSizes() != null) {
+                    arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice) {
+                        @Override
+                        public View getView(int position, View convertView, ViewGroup parent) {
+                            TextView textView = (TextView) super.getView(position, convertView, parent);
+                            textView.setTextColor(Color.WHITE);
+                            return textView;
+                        }
+                    };
+                    list = cam_index.getParameters().getSupportedVideoSizes();
+                    for (Object e_list : list) {
+                        arrayAdapter.addAll(((Camera.Size) e_list).width + "x" + ((Camera.Size) e_list).height);
+                        arrayListForWidth.add(((Camera.Size) e_list).width);
+                        arrayListForHeight.add(((Camera.Size) e_list).height);
+                        Log.d("camera1: ", ((Camera.Size) e_list).width + " x " + ((Camera.Size) e_list).height);
+                    }
+                    lst_of_array_list.add(i, arrayAdapter);
+                }
+            }
+        } catch (Exception e) {
+            Log.d("acama",  "camera is closed or need permission");
         }
     }
 
@@ -757,11 +775,74 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         runOnUiThread(() -> imageView.setImageBitmap(b2));   //buna gerek var mı
     }
 
+    public void OpenCV_face_detect_haarcascade_2() {
+        Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.GaussianBlur(grayMat, grayMat, new Size(21,21), 0);
+        if (avg.empty() || avg == null)      //(avg == null || avg.empty()
+            avg = grayMat.clone();
+
+        if (haarcascade_first.empty()) {
+            avg = grayMat.clone();
+            cascadeClassifier.detectMultiScale(avg, haarcascade_first, 1.1, 3, 3, new Size(30,30));
+        }
+        haarcascadeArray_first = haarcascade_first.toArray();
+        int center_x_first=0, center_y_first=0;
+        for (Rect rect1 : haarcascadeArray_first) {
+            center_x_first = (int) ((rect1.tl().x + rect1.br().x)/2);
+            center_y_first = (int) ((rect1.tl().y + rect1.br().y)/2);
+            Imgproc.rectangle(imageMat, rect1.tl(), rect1.br(), new Scalar(0,255,255), 2);
+        }
+
+
+        MatOfRect haarcascade = new MatOfRect();
+        if (cascadeClassifier != null) {
+            Log.d("face", "2");
+            cascadeClassifier.detectMultiScale(grayMat, haarcascade, 1.1, 3, 3, new Size(30,30));
+        }
+
+        Rect[] haarcascadeArray = haarcascade.toArray();
+
+        int xd1=0, yd1, xd2=0, yd2, center_x=0, center_y=0;
+        for (Rect rect1 : haarcascadeArray) {
+            xd1 = (int) rect1.tl().x;
+            yd1 = (int) rect1.tl().y;
+            xd2 = (int) rect1.br().x;
+            yd2 = (int) rect1.br().y;
+            xvalues.add(xd1);
+
+            center_x = (xd1 + xd2)/2;
+            center_y = (yd1 + yd2)/2;
+            Imgproc.rectangle(imageMat, rect1.tl(), rect1.br(), new Scalar(0,0,255), 2);
+            //Imgproc.drawMarker(imageMat, new Point(center_x, center_y), new Scalar(255,0,0));
+            //Rect roi = new Rect(xd1, yd1, xd2-xd1, yd2-yd1);
+            flag = false;
+        }
+
+        if ((center_x != 0) && (center_x_first != 0) && (xd1 != 0) && (xd2 != 0)) {
+            Imgproc.line(imageMat, new Point(center_x_first, center_y_first), new Point(center_x, center_y), new Scalar(0, 0, 255), 2);
+            if ((center_x_first < imageMat.width()/2) && (center_x > imageMat.width()/2)) {
+                giris++;
+                haarcascade_first = haarcascade;
+            } else if ((center_x_first > imageMat.width()/2) && (center_x < imageMat.width()/2)) {
+                cikis++;
+                haarcascade_first = haarcascade;
+            }
+
+            if (xd2 > imageMat.width()-imageMat.width()/20)
+                haarcascade_first = new MatOfRect();
+            else if (xd1 < imageMat.width()/20)
+                haarcascade_first = new MatOfRect();
+        }
+
+        runOnUiThread(() -> Update_Text(imageMat,giris, cikis));
+    }
+
     public void OpenCV_face_detect_haarcascade() {
         flag = true;
         Log.d("face", "1");
         Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
         Imgproc.GaussianBlur(grayMat, grayMat, new Size(21,21), 0);
+
         MatOfRect haarcascade = new MatOfRect();
         if (cascadeClassifier != null) {
             Log.d("face", "2");
@@ -777,11 +858,11 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             int yd2 = (int) rect1.br().y;
             xvalues.add(xd1);
 
-            //int center_x = (xd1 + xd2)/2;
-            //int center_y = (yd1 + yd2)/2;
+            int center_x = (xd1 + xd2)/2;
+            int center_y = (yd1 + yd2)/2;
             Imgproc.rectangle(imageMat, rect1.tl(), rect1.br(), new Scalar(0,0,255), 2);
             //Imgproc.drawMarker(imageMat, new Point(center_x, center_y), new Scalar(255,0,0));
-            Rect roi = new Rect(xd1, yd1, xd2-xd1, yd2-yd1);
+            //Rect roi = new Rect(xd1, yd1, xd2-xd1, yd2-yd1);
             flag = false;
         }
 
@@ -853,11 +934,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             motion.clear();
         }
 
-        Imgproc.line(imageMat, new Point(imageMat.width()/2.0, 0), new Point(imageMat.width()/2.0, imageMat.height()), new Scalar(255, 0, 0), 2);   //frame.width()/2 = 160, frame.height() = 720
-        Imgproc.putText(imageMat, String.format("Giris: %s", giris), new Point(imageMat.width()/2.0 + 10, 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
-        Imgproc.putText(imageMat, String.format("Cikis: %s", cikis), new Point(10, 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 0, 255), 2);
-
-        runOnUiThread(() -> Update_Text(giris));
+        runOnUiThread(() -> Update_Text(imageMat,giris, cikis));
     }
 
     private int[] majority(List<Integer> motion) {
@@ -880,7 +957,12 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private void Update_Text(int giris) {
+    private void Update_Text(Mat imageMat, int giris, int cikis) {
+        Imgproc.line(imageMat, new Point(imageMat.width()/2.0, 0), new Point(imageMat.width()/2.0, imageMat.height()), new Scalar(255, 0, 0), 2);   //frame.width()/2 = 160, frame.height() = 720
+        Imgproc.putText(imageMat, String.format("Giris: %s", giris), new Point(imageMat.width()/2.0 + 10, 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 255, 0), 2);
+        Imgproc.putText(imageMat, String.format("Cikis: %s", cikis), new Point(10, 40), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 0, 255), 2);
+
+
         txt_current.setText(String.valueOf(giris));
         txt_to_enter.setText(String.valueOf(kapasite - giris));
 
@@ -972,6 +1054,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             thresh = new Mat();
             arr = new ArrayList<>();
 
+            haarcascade_first = new MatOfRect();
         }
 
     }
@@ -1063,10 +1146,9 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         if (motion_detection)
             OpenCV_motion_detection();
 
-        if (face_detection) {
-            OpenCV_face_detect_haarcascade();
-            //
-        }
+        if (face_detection)
+            //OpenCV_face_detect_haarcascade();
+            OpenCV_face_detect_haarcascade_2();
 
         if (no_scanning) {
         }

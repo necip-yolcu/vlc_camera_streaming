@@ -47,9 +47,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:paddingBottom="8dp"
-            android:paddingEnd="8dp"
             android:background="?android:selectableItemBackground"
+            android:onClick="Img_btn_cam_res"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
             app:srcCompat="@drawable/setting_white_48"
             tools:ignore="ContentDescription,RtlSymmetry" />
 
@@ -92,11 +93,11 @@
 
         <TableLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" >
 
             <TableRow
                 android:layout_width="wrap_content"
-                android:layout_height="105dp">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/txt_capacity"
