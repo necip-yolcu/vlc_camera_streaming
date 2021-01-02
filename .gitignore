@@ -19,4 +19,3 @@ local.properties
 /sdk/build/intermediates/javac/debug/classes/
 
 
-*.cpp linguist-detectable=false
