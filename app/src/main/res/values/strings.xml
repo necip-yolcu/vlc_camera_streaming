@@ -84,7 +84,8 @@
 
     <string-array name="cv_array_res">
         <item>Hareket Algılama</item>
-        <item>Yüz Algılama</item>
+        <item>Yüz Algılama 1</item>
+        <item>Yüz Algılama 2</item>
         <item>Tarama Yok</item>
     </string-array>
 

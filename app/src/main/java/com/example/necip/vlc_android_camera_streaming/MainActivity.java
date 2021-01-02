@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         switch (v.getId()) {
             case R.id.img_btn_internal:
                 Intent intent = new Intent(this, VideoActivity.class);
+                //Intent intent = new Intent(this, FaceDetectionAct.class);
                 intent.putExtra("Source", "From MainActivity Internal-Button");
                 startActivity(intent);
                 break;
