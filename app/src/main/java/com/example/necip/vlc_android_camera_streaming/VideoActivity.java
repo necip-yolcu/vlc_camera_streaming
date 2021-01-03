@@ -39,8 +39,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.mlkit.vision.common.InputImage;
@@ -82,14 +80,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static android.hardware.Camera.*;
 import static android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK;
 import static android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT;
 
 public class VideoActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener, CameraBridgeViewBase.CvCameraViewListener2 {
 
     public final static String TAG = "VideoActivity";
-
-    private Mat[] buf = null;
 
     private TextureView textureView;
     private ImageView imageView;
@@ -117,8 +114,8 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     boolean img_btn1, flag, motion_detection, face_detection_1, face_detection_2, no_scanning;
     Bitmap b, b1, b2;
 
-    Mat avg, avg2;
-    Mat imageMat, firstframe, grayMat, grayMat2, accWght, cnvrtScal, frameDelta, cannyEdges, thresh;
+    Mat avg;
+    Mat imageMat, firstframe, grayMat, accWght, cnvrtScal, frameDelta, cannyEdges, thresh, dilate;
 
 
     List<MatOfPoint> contourList;
@@ -134,7 +131,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     int kapasite = 3;
     TextView txt_capacity, txt_current, txt_to_enter;
 
-    Spinner resolution_spinner_cv, resolution_spinner;
+    Spinner resolution_spinner_cv;
     LinearLayout video_linearLayout, linear_layout_of_texture;
     ImageView imageView_walking_standing;
 
@@ -146,8 +143,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     CameraBridgeViewBase cameraBridgeViewBase;
     BaseLoaderCallback baseLoaderCallback;
     private static final int CAMERA_PERMISSION_CODE = 100;
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final int WRITE_EXTERNAL_STORAGE_PERMISSION_CODE = 200;
 
     final Handler handler = new Handler();
     final int updateFreqMs = 30; //30; 1000// call update every 1000 ms 1000/fps
@@ -171,17 +166,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
         //PERMISSION
         checkCameraPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
-        //checkStoragePermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE_PERMISSION_CODE);
-
-        // Check if Google Play Services is installed and its version is at least 20.12.14
-        /// On Android 8.1 Go devices ML Kit requires at least version 20.12.14 to be able to download models properly without a reboot
-        /*
-        int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this, 201214000);
-        if (result != ConnectionResult.SUCCESS) {
-            if (GoogleApiAvailability.getInstance().isUserResolvableError(result)) {
-                GoogleApiAvailability.getInstance().getErrorDialog(this, result, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            }
-        }*/
 
         ///android camera CV
         //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -236,70 +220,71 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                 cameraBridgeViewBase.enableView();
                 img_btn1 = false;
 
+                releaseMat();
+                startMat();
 
-                firstframe.release();
-                avg.release();
-                avg2.release();
-                grayMat.release();
-                grayMat2.release();
-                accWght.release();
-                cnvrtScal.release();
-                frameDelta.release();
-                cannyEdges.release();
-                thresh.release();
-                //haarcascade_first.release();
-
-                firstframe = new Mat();
-                avg = new Mat();
-                avg2 = new Mat();
-                grayMat = new Mat();    //CvType.CV_8UC1 (default for Mat)
-                grayMat2 = new Mat();
-                accWght = new Mat();
-                cnvrtScal = new Mat();
-                frameDelta = new Mat();
-                cannyEdges = new Mat();
-                thresh = new Mat();
-                arr = new ArrayList<>();
-                //haarcascade_first = new MatOfRect();
-
-                cam_index_no.set(0);
-                //cam_index_no.set(CAMERA_FACING_FRONT); //CAMERA_FACING_FRONT
+                //cam_index_no.set(0);
+                cam_index_no.set(CAMERA_FACING_FRONT); //CAMERA_FACING_FRONT
             } else {
                 cameraBridgeViewBase.disableView();
                 cameraBridgeViewBase.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_BACK);
                 cameraBridgeViewBase.enableView();
                 img_btn1 = true;
 
-                firstframe.release();
-                avg.release();
-                avg2.release();
-                grayMat.release();
-                grayMat2.release();
-                accWght.release();
-                cnvrtScal.release();
-                frameDelta.release();
-                cannyEdges.release();
-                thresh.release();
-                //haarcascade_first.release();
+                releaseMat();
+                startMat();
 
-                firstframe = new Mat();
-                avg = new Mat();
-                avg2 = new Mat();
-                grayMat = new Mat();
-                grayMat2 = new Mat();
-                accWght = new Mat();
-                cnvrtScal = new Mat();
-                frameDelta = new Mat();
-                cannyEdges = new Mat();
-                thresh = new Mat();
-                arr = new ArrayList<>();
-                //haarcascade_first = new MatOfRect();
-
-                cam_index_no.set(1);
-                //cam_index_no.set(CAMERA_FACING_BACK); //CAMERA_FACING_BACK
+                //cam_index_no.set(1);
+                cam_index_no.set(CAMERA_FACING_BACK); //CAMERA_FACING_BACK
             }
 
         });
+
+        /*
+        lst_of_array_list = new ArrayList<>();
+        arrayListForWidth = new ArrayList<>();
+        arrayListForHeight = new ArrayList<>();
+        List list;
+
+
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                textView.setTextColor(Color.WHITE);
+                return textView;
+            }
+        };
+
+         */
+
+        /*    //manual
+        int [] w = new int[] {1920,1280,1024,960,848,720,640,480,320,240,160, 1440,1280,1024,960,800,720,640,480,320,160}; //16:9, 4:3
+        int [] h = new int[] {1080,720,576,540,480,405,360,270,180,135,90, 1080,960,768,720,600,540,480,360,240,120};
+        String rate;
+        for (int i=0; i<w.length; i++) {
+            if (w[i]/h[i] == (16/9))
+                rate = "(16:9)";
+            else
+                rate = "(4:3)";
+            arrayAdapter.add(w[i] + "x" + h[i] + " " +rate);
+            arrayListForWidth.add(w[i]);
+            arrayListForHeight.add(h[i]);
+        }
+         */
+
+        /*
+        list = cam_index.getParameters().getSupportedVideoSizes();
+        for (Object e_list : list) {
+            arrayAdapter.addAll(((Camera.Size) e_list).width + "x" + ((Camera.Size) e_list).height);
+            arrayListForWidth.add(((Camera.Size) e_list).width);
+            arrayListForHeight.add(((Camera.Size) e_list).height);
+            Log.d("camera1: ", ((Camera.Size) e_list).width + " x " + ((Camera.Size) e_list).height);
+        }
+
+         */
+
+
 
         checkedItem = new int[]{1}; //arrayAdapter.getCount() - 1; son olan
         img_btn_cam_res = findViewById(R.id.img_btn_cam_res);
@@ -314,14 +299,20 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                 //AlertDialog.Builder builder = new AlertDialog.Builder(VideoActivity.this);
                 builder.setCancelable(false);
                 builder.setTitle("Çözünürlük Seçiniz");
-                Log.d("acam", lst_of_array_list + "");
+                Log.d("acamf", lst_of_array_list.size() + "");
+                Log.d("acamf", cam_index_no + "");
                 try {
                     builder.setSingleChoiceItems(lst_of_array_list.get(cam_index_no.get()), checkedItem[0], new DialogInterface.OnClickListener() {
+                    //builder.setSingleChoiceItems(arrayAdapter, checkedItem[0], new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             checkedItem[0] = i;
                             cameraBridgeViewBase.setMaxFrameSize(arrayListForWidth.get(i), arrayListForHeight.get(i));
                             cameraBridgeViewBase.disableView();
+                            //avg.release();
+                            //avg = new Mat();
+                            releaseMat();
+                            startMat();
                             cameraBridgeViewBase.enableView();
                             Toast.makeText(VideoActivity.this, "Çözünürlük:  " +
                                     arrayListForWidth.get(i) + "x" + arrayListForHeight.get(i), Toast.LENGTH_LONG).show();
@@ -369,53 +360,48 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                 String item2 = (String) spinner2.getSelectedItem();
                 switch (item2) {
                     case "Hareket Algılama":
-                        Log.d("herec", "MotionDetect clicked");
                         no_scanning = false;
                         face_detection_1 = false;
                         face_detection_2 = false;
                         motion_detection = true;
 
-                        //imageMat.release();
-                        //giris = 0;  cikis = 0;
-                        //Update_Text(giris);
+                        releaseMat();
+                        startMat();
+                        giris = 0;  cikis = 0;
                         break;
                     case "Yüz Algılama 1":
-                        Log.d("herec", "FaceDetect 1 clicked");
                         no_scanning = false;
                         motion_detection = false;
                         face_detection_1 = true;
                         face_detection_2 = false;
                         face_builder();
 
-                        //imageMat.release();
-                        //giris = 0;  cikis = 0;
-                        //Update_Text(giris);
+                        releaseMat();
+                        startMat();
+                        giris = 0;  cikis = 0;
                         break;
                     case "Yüz Algılama 2":
-                        Log.d("herec", "FaceDetect 2 clicked");
                         no_scanning = false;
                         motion_detection = false;
                         face_detection_1 = false;
                         face_detection_2 = true;
                         face_builder();
 
-                        //imageMat.release();
-                        //giris = 0;  cikis = 0;
-                        //Update_Text(giris);
+                        releaseMat();
+                        startMat();
+                        giris = 0;  cikis = 0;
                         break;
                     case "Tarama Yok":
-                        Log.d("herec", "No scannning clicked");
                         motion_detection = false;
                         face_detection_1 = false;
                         face_detection_2 = false;
                         no_scanning = true;
 
-                        //imageMat.release();
-                        //giris = 0;  cikis = 0;
-                        //Update_Text(giris);
+                        releaseMat();
+                        startMat();
+                        giris = 0;  cikis = 0;
                         break;
                 }
-                //command_input.setText(String.valueOf(ip_command));
             }
 
             public void onNothingSelected(AdapterView<?> parent) {
@@ -432,13 +418,10 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
         // Get URL
         Intent intent = getIntent();
-        Log.d("here", "1");
         if (intent != null) {
-            Log.d("here", "2");
             String str_data = intent.getExtras().getString("Source");
             if (str_data.equals("From External Activity")) {
                 rtspUrl = intent.getExtras().getString(rtspUrl);
-                Log.d("here", "3_1_external: "+ rtspUrl);
                 from_external = true;
                 from_internal = false;
                 cameraBridgeViewBase.setCvCameraViewListener((CameraBridgeViewBase.CvCameraViewListener2) null);
@@ -469,7 +452,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
 
             } else if (str_data.equals("From MainActivity Internal-Button")) {
-                Log.d("here", "4_internal");
                 from_external = false;
                 from_internal = true;
                 cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
@@ -498,6 +480,33 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
     }
 
+    private void releaseMat() {
+        firstframe.release();
+        avg.release();
+        grayMat.release();
+        accWght.release();
+        cnvrtScal.release();
+        frameDelta.release();
+        cannyEdges.release();
+        thresh.release();
+        dilate.release();
+        haarcascade_first.release();
+    }
+
+    private void startMat() {
+        firstframe = new Mat();
+        avg = new Mat();
+        grayMat = new Mat();    //CvType.CV_8UC1 (default for Mat)
+        accWght = new Mat();
+        cnvrtScal = new Mat();
+        frameDelta = new Mat();
+        cannyEdges = new Mat();
+        thresh = new Mat();
+        dilate = new Mat();
+        arr = new ArrayList<>();
+        haarcascade_first = new MatOfRect();
+    }
+
     public void checkCameraPermission(String permission, int requestCode) {
         /*
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED)
@@ -524,21 +533,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         }
     }
 
-    public void checkStoragePermission(String permission, int requestCode) {
-        String TAG = "Storage Permission";
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (this.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG, "Permission is granted");
-            } else {
-                Log.v(TAG, "Permission is revoked");
-                ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
-            }
-        }
-        else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG,"Permission is granted");
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -551,28 +545,29 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             else
                 Toast.makeText(this, "Kamera izni reddedildi", Toast.LENGTH_SHORT).show();
         }
-        /*else if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                Toast.makeText(VideoActivity.this, "Depolama izni verildi", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(VideoActivity.this, "Depolama izni reddedildi", Toast.LENGTH_SHORT).show();
-        }*/
     }
 
     public void camera_allow() {
         try {
-            Log.d("acama", "open");
 
             lst_of_array_list = new ArrayList<>();
 
             arrayListForWidth = new ArrayList<>();
             arrayListForHeight = new ArrayList<>();
             List list;
-            int index;
             for (int i = 0; i<2; i++) {  //index=0 means CAMERA__BACK, =1 means _FRONT
-                index = ((i == 0) ? CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT);
-                Camera cam_index = Camera.open(index);
-                if (cam_index.getParameters().getSupportedVideoSizes() != null) {
+                int index = ((i == 0) ? CAMERA_FACING_BACK : CameraInfo.CAMERA_FACING_FRONT);
+                Camera cam_index;
+                try {
+                    cam_index = open(i);
+                } catch (Exception e) {
+                    cam_index = open();
+                }
+                if (cam_index.getParameters().getSupportedVideoSizes() != null || cam_index.getParameters().getSupportedPreviewSizes() != null) {
+                    if (cam_index.getParameters().getSupportedVideoSizes() != null)
+                        list = cam_index.getParameters().getSupportedVideoSizes();
+                    else
+                        list = cam_index.getParameters().getSupportedPreviewSizes();
                     arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice) {
                         @Override
                         public View getView(int position, View convertView, ViewGroup parent) {
@@ -581,7 +576,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                             return textView;
                         }
                     };
-                    list = cam_index.getParameters().getSupportedVideoSizes();
                     for (Object e_list : list) {
                         arrayAdapter.addAll(((Camera.Size) e_list).width + "x" + ((Camera.Size) e_list).height);
                         arrayListForWidth.add(((Camera.Size) e_list).width);
@@ -592,64 +586,11 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                 }
             }
         } catch (Exception e) {
-            Log.d("acama",  "camera is closed or need permission");
+            Log.d("here",  "camera is closed or need permission");
         }
-    }
-
-    public void saved_bmp(View v) {
-        b = textureView.getBitmap(textureView.getWidth(),textureView.getHeight());
-
-        // Bitmap to Mat
-        imageMat = new Mat(b.getHeight(), b.getWidth(), CvType.CV_8UC1);
-        b1 = b.copy(Bitmap.Config.ARGB_8888, true);
-        Utils.bitmapToMat(b1, imageMat);
-        Imgproc.line(imageMat, new Point(imageMat.width()/2, 0), new Point(imageMat.width()/2, imageMat.height()), new Scalar(0, 255, 0), 2);   //frame.width()/2 = 160, frame.height() = 720
-        // Mat to Bitmap
-        b2 = Bitmap.createBitmap(imageMat.cols(), imageMat.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(imageMat, b2);
-        imageView.setImageBitmap(b2);
-
-
-        /*
-        try {
-            frame = Utils.loadResource(getApplicationContext(), R.drawable.foto1);
-        } catch (IOException e) { e.printStackTrace(); }
-
-        final Bitmap bmp1 = Bitmap.createBitmap(frame.cols(), frame.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(frame, bmp1);
-        imageView.setVisibility(View.VISIBLE);
-
-
-        String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root + "/saved_images");
-        if (!myDir.exists()) {
-            myDir.mkdirs();
-        }
-        Random generator = new Random();
-        int n = 10000;
-        n = generator.nextInt(n);
-        String fname = "Image-"+ n +".jpg";
-        File file = new File (myDir, fname);
-        if (file.exists ())
-            file.delete ();
-        try {
-            file.createNewFile(); // if file already exists will do nothing
-            FileOutputStream out = new FileOutputStream(file);
-            Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_LONG).show();
-            b.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            out.flush();
-            out.close();
-            Toast.makeText(getApplicationContext(), "kaydedildi", Toast.LENGTH_LONG).show();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "hata: " + e, Toast.LENGTH_LONG).show();
-        }
-         */
     }
 
     private void createPlayer(String rtspUrl) {
-        Log.d("here", "createPlayer()");
         releasePlayer();
         try {
             ArrayList<String> options = new ArrayList<>();
@@ -760,7 +701,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
                             //openCV_per_face(imageMat, bounds);
                         }
 
-                        OpenCV_3();
+                        //OpenCV_3();
                         MatToBitmap_setImageBitmap();
 
                     }
@@ -821,15 +762,47 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         runOnUiThread(() -> imageView.setImageBitmap(b2));   //buna gerek var mı
     }
 
-    public void OpenCV_face_detect_haarcascade_2() {
-        Imgproc.cvtColor(imageMat, grayMat2, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.GaussianBlur(grayMat2, grayMat2, new Size(21,21), 0);
-        if (avg2.empty() || avg2 == null)      //(avg == null || avg.empty()
-            avg2 = grayMat2.clone();
+    public void OpenCV_face_detect_haarcascade() {
+        flag = true;
+        Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.GaussianBlur(grayMat, grayMat, new Size(21,21), 0);
 
+        MatOfRect haarcascade = new MatOfRect();
+        if (cascadeClassifier != null) {
+            Log.d("face", "2");
+            cascadeClassifier.detectMultiScale(grayMat, haarcascade, 1.1, 3, 3, new Size(30,30));
+        }
+
+        Rect[] haarcascadeArray = haarcascade.toArray();
+
+        for (Rect rect1 : haarcascadeArray) {
+            int xd1 = (int) rect1.tl().x;
+            int yd1 = (int) rect1.tl().y;
+            int xd2 = (int) rect1.br().x;
+            int yd2 = (int) rect1.br().y;
+            xvalues.add(xd1);
+
+            int center_x = (xd1 + xd2)/2;
+            int center_y = (yd1 + yd2)/2;
+            Imgproc.rectangle(imageMat, rect1.tl(), rect1.br(), new Scalar(0,0,255), 2);
+            //Imgproc.drawMarker(imageMat, new Point(center_x, center_y), new Scalar(255,0,0));
+            //Rect roi = new Rect(xd1, yd1, xd2-xd1, yd2-yd1);
+            flag = false;
+        }
+
+        OpenCV_counting(xvalues, flag);
+    }
+
+    public void OpenCV_face_detect_haarcascade_2() {
+        Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.GaussianBlur(grayMat, grayMat, new Size(21,21), 0);
+        if (avg.empty() || avg == null)      //(avg == null || avg.empty()
+            avg = grayMat.clone();
+
+        // what if avg && grayMat has 0x0
         if (haarcascade_first.empty()) {
-            avg2 = grayMat2.clone();
-            cascadeClassifier.detectMultiScale(avg2, haarcascade_first, 1.1, 3, 3, new Size(30,30));
+            avg = grayMat.clone();
+            cascadeClassifier.detectMultiScale(avg, haarcascade_first, 1.1, 3, 3, new Size(30,30));
         }
         haarcascadeArray_first = haarcascade_first.toArray();
         int center_x_first=0, center_y_first=0;
@@ -841,7 +814,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
         MatOfRect haarcascade = new MatOfRect();
         if (cascadeClassifier != null)
-            cascadeClassifier.detectMultiScale(grayMat2, haarcascade, 1.1, 3, 3, new Size(30,30));
+            cascadeClassifier.detectMultiScale(grayMat, haarcascade, 1.1, 3, 3, new Size(30,30));
 
         Rect[] haarcascadeArray = haarcascade.toArray();
         int xd1=0, yd1, xd2=0, yd2, center_x=0, center_y=0;
@@ -879,80 +852,6 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         Update_Text(giris);
     }
 
-    public void OpenCV_face_detect_haarcascade() {
-        flag = true;
-        Log.d("face", "1");
-        Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
-        Imgproc.GaussianBlur(grayMat, grayMat, new Size(21,21), 0);
-
-        MatOfRect haarcascade = new MatOfRect();
-        if (cascadeClassifier != null) {
-            Log.d("face", "2");
-            cascadeClassifier.detectMultiScale(grayMat, haarcascade, 1.1, 3, 3, new Size(30,30));
-        }
-
-        Rect[] haarcascadeArray = haarcascade.toArray();
-
-        for (Rect rect1 : haarcascadeArray) {
-            int xd1 = (int) rect1.tl().x;
-            int yd1 = (int) rect1.tl().y;
-            int xd2 = (int) rect1.br().x;
-            int yd2 = (int) rect1.br().y;
-            xvalues.add(xd1);
-
-            int center_x = (xd1 + xd2)/2;
-            int center_y = (yd1 + yd2)/2;
-            Imgproc.rectangle(imageMat, rect1.tl(), rect1.br(), new Scalar(0,0,255), 2);
-            //Imgproc.drawMarker(imageMat, new Point(center_x, center_y), new Scalar(255,0,0));
-            //Rect roi = new Rect(xd1, yd1, xd2-xd1, yd2-yd1);
-            flag = false;
-        }
-
-        OpenCV_counting(xvalues, flag);
-    }
-
-    @SuppressLint({"SetTextI18n"})
-    private void OpenCV_motion_detection2() {
-        flag = true;
-        contourList = new ArrayList<>(); //A list to store all the contours
-
-        Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_BGR2GRAY);
-        //Imgproc.cvtColor(imageMat, grayMat, Imgproc.COLOR_RGBA2GRAY);
-        Imgproc.GaussianBlur(grayMat, grayMat, new Size(5,5), 0);    //size(5,5),5   //size(21,21),0
-        Imgproc.Canny(grayMat, cannyEdges, 10, 100); //10,100   //  75,200     //75,150
-
-        if (buf == null || buf[0].size() != imageMat.size()) {
-            if (buf == null)
-                buf = new Mat[1];
-            if (buf[0] != null) {
-                buf[0].release();
-                buf[0] = null;
-            }
-            buf[0] = new Mat(imageMat.size(), CvType.CV_8UC1);
-            buf[0] = Mat.zeros(imageMat.size(), CvType.CV_8UC1);
-
-        }
-
-
-        //Imgproc.threshold(frameDelta, thresh, 5, 255, Imgproc.THRESH_BINARY); //thresh:25
-        //Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
-        Imgproc.findContours(cannyEdges, contourList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);       //RETR_EXTERNAL, RETR_LIST
-
-        for (int i=0; i < contourList.size(); i++) {
-            if (Imgproc.contourArea(contourList.get(i)) > 5000) {    //5000
-                Log.d("motion_contour ", "feys");
-                rect = Imgproc.boundingRect(contourList.get(i));
-                arr.add(rect);
-                xvalues.add(rect.x);
-                Imgproc.rectangle(imageMat, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0,0,255), 2);
-                flag = false;
-
-            }
-        }
-
-        OpenCV_counting(xvalues, flag);
-    }
-
     @SuppressLint({"SetTextI18n"})
     private void OpenCV_motion_detection() {
         flag = true;
@@ -964,31 +863,32 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
         if (avg.empty() || avg == null) {
             grayMat.convertTo(avg, CvType.CV_32F);
-            Log.d("avg", "her");
-        }
+            if (avg.width()==0 && avg.height()==0)
+                Log.e("avg", avg.size() + "-" + grayMat.size());
+        } else {              // we couldnt use <continue> in above if statement, that's why <else> is best option
+            Imgproc.accumulateWeighted(grayMat, avg, 0.5);
+            Core.convertScaleAbs(avg, cnvrtScal);
+            Core.absdiff(grayMat, cnvrtScal, frameDelta);
+            ///compute difference between first frame and current frame
+            ///Core.absdiff(grayMat, avg, frameDelta); //üstteki 3 satır veya bu.
 
-        Imgproc.accumulateWeighted(grayMat, avg, 0.5);
-        Core.convertScaleAbs(avg, cnvrtScal);
-        Core.absdiff(grayMat, cnvrtScal, frameDelta);
-        ///compute difference between first frame and current frame
-        ///Core.absdiff(grayMat, avg, frameDelta); //üstteki 3 satır veya bu.
-
-        Imgproc.threshold(frameDelta, thresh, 5, 255, Imgproc.THRESH_BINARY); //thresh:25
-        Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
-        Imgproc.findContours(thresh, contourList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.threshold(frameDelta, thresh, 5, 255, Imgproc.THRESH_BINARY); //thresh:25
+            Imgproc.dilate(thresh, dilate, new Mat(), new Point(-1, -1), 2);
+            Imgproc.findContours(dilate, contourList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
 
-        for (int i=0; i < contourList.size(); i++) {
-            if (Imgproc.contourArea(contourList.get(i)) > 5000) {
-                rect = Imgproc.boundingRect(contourList.get(i));
-                arr.add(rect);
-                xvalues.add(rect.x);
-                Imgproc.rectangle(imageMat, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0,0,255), 2);
-                flag = false;
+            for (int i=0; i < contourList.size(); i++) {
+                if (Imgproc.contourArea(contourList.get(i)) > 5000) {
+                    rect = Imgproc.boundingRect(contourList.get(i));
+                    arr.add(rect);
+                    xvalues.add(rect.x);
+                    Imgproc.rectangle(imageMat, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0,0,255), 2);
+                    flag = false;
+                }
             }
-        }
 
-        OpenCV_counting(xvalues, flag);
+            OpenCV_counting(xvalues, flag);
+        }
 
     }
 
@@ -1068,16 +968,14 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             //continue;
         }
 
-        Mat frameDelta = new Mat();
         Core.absdiff(firstframe, grayMat, frameDelta);
-        Mat thresh = new Mat();
         Imgproc.threshold(frameDelta, thresh, 25, 255, Imgproc.THRESH_BINARY);
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
 
         Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
+        Imgproc.dilate(thresh, dilate, new Mat(), new Point(-1, -1), 2);
 
         for (MatOfPoint mf : contours) {
 
@@ -1114,21 +1012,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
         handler.removeCallbacksAndMessages(null);
 
-
-        imageMat.release();
-        firstframe.release();
-        avg.release();
-        avg2.release();
-        grayMat.release();
-        grayMat2.release();
-        accWght.release();
-        cnvrtScal.release();
-        frameDelta.release();
-        cannyEdges.release();
-        thresh.release();
-        arr.clear();
-        haarcascade_first.release();
-
+        //releaseMat();
     }
 
     @Override
@@ -1145,22 +1029,8 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
             baseLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
             //cameraBridgeViewBase.enableView();
 
-            //set first frame
-            //imageMat = new Mat(CvType.CV_8UC4);
-            firstframe = new Mat();
-            avg = new Mat();
-            avg2 = new Mat();
-            grayMat = new Mat();
-            grayMat2 = new Mat();
-            accWght = new Mat();
-            cnvrtScal = new Mat();
-            frameDelta = new Mat();
-            cannyEdges = new Mat();
-            thresh = new Mat();
-            arr = new ArrayList<>();
-            haarcascade_first = new MatOfRect();
+            startMat();
         }
-
     }
 
     @Override
@@ -1189,14 +1059,11 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        Log.d("here", "onSurfaceTextureAvailable");
         //textureView.getSurfaceTexture().setDefaultBufferSize(width, height);
         Log.d("here", "onSurfaceTextureAvailable: " + width + height);
         try {
-            if (from_external) {
-                Log.d("here", "3_2: " + rtspUrl);
+            if (from_external)
                 createPlayer(rtspUrl);
-            }
         } catch (Exception e) {
             Toast.makeText(this, "???????????????", Toast.LENGTH_SHORT).show();
         }
@@ -1231,7 +1098,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
     @Override
     public void onCameraViewStopped() {
         Log.d("here", "onCameraViewStopped");
-        //1 imageMat.release(); bu veya aşağıdaki 3 satır
+        // imageMat.release(); bu veya aşağıdaki 3 satır
         if(imageMat != null) {
             imageMat.release();
         }
@@ -1250,6 +1117,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         Imgproc.resize(imageMat, imageMat, inputFrame.rgba().size()); //new Size(width:.. , height: ..)
         Log.d("here", "onCameraFrame: " + inputFrame.rgba().size());
 
+
         if (motion_detection)
             OpenCV_motion_detection();
 
@@ -1262,7 +1130,7 @@ public class VideoActivity extends AppCompatActivity implements TextureView.Surf
         if (no_scanning) {
         }
 
-        inputFrame.rgba().release();  //buna gerek var mı???
+        inputFrame.rgba().release();  //buna gerek var mı??? zaten yukerıda release oluyor
 
         return imageMat;
     }

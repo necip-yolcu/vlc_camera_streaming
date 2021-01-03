@@ -21,6 +21,8 @@
         android:required="false"/>
     <uses-feature android:name="android.hardware.camera.back"
         android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.back.autofocus"
+        android:required="false"/>
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
