@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/video_linearLayout"
@@ -8,19 +9,19 @@
     android:background="#009900"
     android:keepScreenOn="true"
     android:orientation="vertical"
-    tools:context=".VideoActivity">
+    tools:context=".VideoFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="9">
+        android:layout_weight="8" >
 
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/ic_launcher_background"
-            tools:ignore="ContentDescription"/>
+            tools:ignore="ContentDescription" />
 
         <org.opencv.android.JavaCameraView
             android:id="@+id/myAndroidCameraView"
@@ -34,12 +35,18 @@
             android:id="@+id/img_btn_cam_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:paddingBottom="8dp"
             android:background="?android:selectableItemBackground"
             app:srcCompat="@drawable/camera_switch_back"
             tools:ignore="ContentDescription" />
+        <!--
+            app:srcCompat="@drawable/camera_switch_back"
+            android:background="?android:selectableItemBackground"
+
+         -->
+
 
         <ImageButton
             android:id="@+id/img_btn_cam_res"
@@ -47,11 +54,16 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:background="?android:selectableItemBackground"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
+            android:background="?android:selectableItemBackground"
             app:srcCompat="@drawable/setting_white_48"
             tools:ignore="ContentDescription,RtlSymmetry" />
+        <!--
+           app:srcCompat="@drawable/setting_white_48"
+           android:background="?android:selectableItemBackground"
+                -->
+
 
     </RelativeLayout>
 
@@ -85,40 +97,135 @@
         <ImageView
             android:id="@+id/imageView_walking_standing"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:paddingStart="8dp"
             android:src="@drawable/walking"
             tools:ignore="ContentDescription,RtlSymmetry" />
+        <!--android:src="@drawable/walking"-->
 
-        <TableLayout
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="clip_horizontal"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/txt_capacity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:paddingStart="10dp"
+                    android:paddingTop="20dp"
+                    android:textAlignment="center"
+                    android:textColor="#FFFFFF"
+                    android:drawableStart="@drawable/up_arrow_32"
+                    android:textSize="30sp"
+                    tools:ignore="Autofill,LabelFor,RtlSymmetry,TextViewEdits" />
+                <!--android:drawableStart="@drawable/up_arrow_32"-->
 
                 <TextView
-                    android:id="@+id/txt_capacity"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_column="1"
+                    android:id="@+id/txt_current"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:inputType="number"
-                    android:paddingStart="30dp"
-                    android:paddingTop="30dp"
-                    android:text=""
+                    android:paddingStart="10dp"
+                    android:paddingTop="20dp"
                     android:textAlignment="center"
                     android:textColor="#FFFFFF"
                     android:textSize="30sp"
                     tools:ignore="RtlSymmetry,TextViewEdits" />
 
                 <TextView
-                    android:id="@+id/txt_current"
+                    android:id="@+id/txt_to_enter"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:paddingStart="10dp"
+                    android:paddingTop="20dp"
+                    android:textAlignment="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="30sp"
+                    tools:ignore="RtlSymmetry,TextViewEdits" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/textView5"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/capacity"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/current"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/available"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!--
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/txt_capacity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_column="1"
+                    android:inputType="number"
+                    android:paddingStart="10dp"
+                    android:paddingTop="30dp"
+                    android:textAlignment="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="30sp"
+                    tools:ignore="Autofill,LabelFor,RtlSymmetry,TextViewEdits" />
+                -android:drawableStart="@drawable/up_arrow_32"
+
+
+                <TextView
+                    android:id="@+id/txt_current"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_column="2"
                     android:inputType="number"
-                    android:paddingStart="30dp"
+                    android:paddingStart="10dp"
                     android:paddingTop="30dp"
                     android:text=""
                     android:textAlignment="center"
@@ -128,11 +235,11 @@
 
                 <TextView
                     android:id="@+id/txt_to_enter"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_column="3"
                     android:inputType="number"
-                    android:paddingStart="30dp"
+                    android:paddingStart="10dp"
                     android:paddingTop="30dp"
                     android:text=""
                     android:textAlignment="center"
@@ -182,6 +289,8 @@
 
         </TableLayout>
 
+        -->
+
         <TextureView
             android:id="@+id/textureView"
             android:layout_width="200dp"
@@ -189,6 +298,5 @@
             android:visibility="visible" />
 
     </LinearLayout>
-
 
 </LinearLayout>

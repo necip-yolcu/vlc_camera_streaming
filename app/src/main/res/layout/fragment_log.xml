@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linear_layout_of_fragment_log"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LogFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        tools:ignore="UselessParent">
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txt_log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:inputType="textMultiLine"
+                android:layout_gravity="bottom"
+                tools:ignore="RtlHardcoded,TextViewEdits"
+                />
+            <!--  android:inputType="textMultiLine"
+                  android:singleLine="true"
+                    -->
+
+        </HorizontalScrollView>
+
+    </ScrollView>
+
+</LinearLayout>

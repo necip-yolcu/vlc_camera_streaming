@@ -1,18 +1,33 @@
 <resources>
-    <string name="app_name">IP&amp;Android Kamera</string>
+    <string name="app_name">IP&amp;Android Camera</string>
+    <string name="title_activity_android_localize">IP&amp;Android Camera</string>
 
-    <string name="protocol_set">Protokol</string>
+    <string name="version_alert">Version: </string>
+    <string name="send_email_alert">Send e-mail</string>
+    <string name="negative_button_alert_item">OK</string>
+    <string name="switch_lang_item">Switch Language</string>
+    <string name="cancel_lang_switch_neg">Cancel</string>
+    <string-array name="languages">
+        <item>@string/turkish_lang</item>
+        <item>@string/english_lang</item>
+    </string-array>
+    <string name="turkish_lang">tr</string>
+    <string name="english_lang">en</string>
+
+    <string name="external_camera_title">External Camera</string>
+
+    <string name="protocol_set">Protocol</string>
     <string name="ip_cam_http">1 (HTTP)</string>
     <string name="ip_cam_rtsp">2 (RTSP)</string>
 
-    <string name="ip_setting_label">Adres</string>
+    <string name="ip_setting_label">Address</string>
     <string name="address_dot">.</string>
 
     <string name="port_setting_label">Port no</string>
-    <string name="username_setting_label">Kullanıcı adı</string>
-    <string name="password_setting_label">Şifre</string>
+    <string name="username_setting_label">Username</string>
+    <string name="password_setting_label">Password</string>
 
-    <string name="command_setting_label">Uzantı</string>
+    <string name="command_setting_label">Command</string>
     <string-array name="command_array_res">
         <item>snap.jpg (for photo)</item>
         <item>0</item>
@@ -27,11 +42,11 @@
 
     <string name="txtWebLink">
         <u>
-            <font color='blue'>ip kamera uzantımı bul</font>
+            <font color='blue'>find my ip camera extension</font>
         </u>
     </string>
 
-    <string name="resolution_label">Çözünürlük</string>
+    <string name="resolution_label">Resolution</string>
     <string name="resolution_times"> x </string>
     <string-array name="resolution_array_res">
         <item>1920x1080 (16:9)</item>
@@ -61,16 +76,18 @@
     </string-array>
 
 
-    <string name="start">BAŞLAT</string>
-    <string name="current">MEVCUT</string>
-    <string name="capacity">KAPASİTE</string>
-    <string name="enter">GİREBİLİR</string>
-    <string name="play">OYNAT!</string>
-    <string name="switch1">SEÇENEK 1</string>
-    <string name="switch2">SEÇENEK 2</string>
-    <string name="command_input_hint">URL uzantısını giriniz</string>
-    <string name="password_input_hint">Şifreyi giriniz</string>
-    <string name="username_input_hint">Kullanıcı adınızı giriniz</string>
+    <string name="start">START</string>
+    <string name="current">CURRENT</string>
+    <string name="capacity">CAPACITY</string>
+    <string name="available">AVAILABLE</string>
+    <string name="play">PLAY!</string>
+    <string name="switch1">OPTION 1</string>
+    <string name="switch2">OPTION 2</string>
+    <string name="command_input_hint">Enter URL extension</string>
+    <string name="username_input_hint">Enter username</string>
+    <string name="username">username</string>
+    <string name="password_input_hint">Enter password</string>
+    <string name="password">password</string>
     <string name="port_input_hint">80/8080/554</string>
     <string name="address4_input_hint">183</string>
     <string name="address3_input_hint">0</string>
@@ -79,14 +96,40 @@
     <string name="textRTSPUrl_hint">rtsp://{user}:{pass}@host:554/{videosource}</string>
     <string name="textRTSPUrl_text">rtsp://admin:1625necip@192.168.0.183:554/1</string>
     <string name="rtsp_url_set">RTSP URL</string>
-    <string name="tgl_cam_text_off">Ön Kamera</string>
-    <string name="tgl_cam_text_on">Arka Kamera</string>
+    <string name="warning_external_act">Warning!!</string>
+    <string name="warning_ext_act_message">Please select one of above button</string>
+    <string name="warning_ext_act_pos_btn">OK</string>
+
+    <string name="tgl_cam_text_off">Front Camera</string>
+    <string name="tgl_cam_text_on">Back Camera</string>
+    <string name="img_btn_cam_res_title">Choose Resolution</string>
+    <string name="img_btn_cam_res_pos_btn">OK</string>
+    <string name="img_btn_cam_res_neg_btn">Cancel</string>
+
+    <string name="input_no">Input: </string>
+    <string name="output_no">Output: </string>
 
     <string-array name="cv_array_res">
-        <item>Hareket Algılama</item>
-        <item>Yüz Algılama 1</item>
-        <item>Yüz Algılama 2</item>
-        <item>Tarama Yok</item>
+        <item>@string/motion_detect</item>
+        <item>@string/face_detect_1</item>
+        <item>@string/face_detect_2</item>
+        <item>@string/no_scanning</item>
     </string-array>
+    <string name="motion_detect">Motion Detection</string>
+    <string name="face_detect_1">Face Detection 1</string>
+    <string name="face_detect_2">Face Detection 2</string>
+    <string name="no_scanning">No Scanning</string>
+
+    <string name="live_nav_menu">Live</string>
+    <string name="logs_nav_menu">Logs</string>
+    <string name="share_item">Share</string>
+    <string name="sharing_intent_title">Share via..</string>
+    <string name="pause_item">Pause</string>
+    <string name="verbose_item">Verbose</string>
+    <string name="debug_item">Debug</string>
+    <string name="information_item">Information</string>
+    <string name="warning_item">Warning</string>
+    <string name="error_item">Error</string>
+    <string name="clear_log_item">Clear log</string>
 
 </resources>

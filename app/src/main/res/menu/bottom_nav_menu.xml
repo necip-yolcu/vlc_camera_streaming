@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/live_item"
+        android:icon="@drawable/icon_video_24"
+        android:title="@string/live_nav_menu" />
+
+    <item
+        android:id="@+id/log_item"
+        android:icon="@drawable/icon_log_24_blue"
+        android:title="@string/logs_nav_menu" />
+
+</menu>

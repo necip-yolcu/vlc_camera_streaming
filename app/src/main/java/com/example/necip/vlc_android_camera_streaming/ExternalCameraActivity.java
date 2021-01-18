@@ -42,10 +42,13 @@ public class ExternalCameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_external_camera);
 
-        setTitle("Harici Kamera");
+        setTitle(getString(R.string.external_camera_title));
 
         switch1 = findViewById(R.id.switch1);
+        switch1.setOnClickListener(btnListener);
         switch2 = findViewById(R.id.switch2);
+        switch2.setOnClickListener(btnListener);
+
 
         linearLayout_option_1 = findViewById(R.id.linearLayout_option_1);
         linearLayout_option_2 = findViewById(R.id.linearLayout_option_2);
@@ -84,9 +87,9 @@ public class ExternalCameraActivity extends AppCompatActivity {
         port_input = findViewById(R.id.port_input);
         port_input.setText(String.valueOf(80));
         username_input = findViewById(R.id.username_input);
-        username_input.setText("kullanıcı");
+        username_input.setText(R.string.username);
         password_input = findViewById(R.id.password_input);
-        password_input.setText("şifre");
+        password_input.setText(R.string.password);
         width_input = findViewById(R.id.width_input);
         width_input.setText(String.valueOf(640));
         height_input = findViewById(R.id.height_input);
@@ -116,92 +119,70 @@ public class ExternalCameraActivity extends AppCompatActivity {
                 String item = (String) spinner.getSelectedItem();
                 switch (item) {
                     case "1920x1080 (16:9)":
-                        width = 1920;
-                        height = 1080;
+                        width = 1920;   height = 1080;
                         break;
                     case "1280x720 (16:9)":
-                        width = 1280;
-                        height = 720;
+                        width = 1280;   height = 720;
                         break;
                     case "1024x576 (16:9)":
-                        width = 1024;
-                        height = 576;
+                        width = 1024;   height = 576;
                         break;
                     case "960x540 (16:9)":
-                        width = 960;
-                        height = 540;
+                        width = 960;    height = 540;
                         break;
                     case "848x480 (16:9)":
-                        width = 848;
-                        height = 480;
+                        width = 848;    height = 480;
                         break;
                     case "720x405 (16:9)":
-                        width = 720;
-                        height = 405;
+                        width = 720;    height = 405;
                         break;
                     case "640x360 (16:9)":
-                        width = 640;
-                        height = 360;
+                        width = 640;    height = 360;
                         break;
                     case "480x270 (16:9)":
-                        width = 480;
-                        height = 270;
+                        width = 480;    height = 270;
                         break;case "320x180 (16:9)":
-                        width = 320;
-                        height = 180;
+                        width = 320;    height = 180;
                         break;
                     case "240x135 (16:9)":
-                        width = 240;
-                        height = 135;
+                        width = 240;    height = 135;
                         break;
                     case "160x90 (16:9)":
-                        width = 160;
-                        height = 90;
+                        width = 160;    height = 90;
                         break;
 
                     case "1920x1440 (4:3)":
-                        width = 1920;
-                        height = 1440;
+                        width = 1920;   height = 1440;
                         break;
                     case "1440x1080 (4:3)":
-                        width = 1440;
-                        height = 1080;
+                        width = 1440;   height = 1080;
                         break;
                     case "1280x960 (4:3)":
-                        width = 1280;
-                        height = 960;
+                        width = 1280;   height = 960;
                         break;
                     case "1024x768 (4:3)":
-                        width = 1024;
-                        height = 768;
+                        width = 1024;   height = 768;
                         break;
                     case "960x720 (4:3)":
-                        width = 960;
-                        height = 720;
+                        width = 960;    height = 720;
                         break;
                     case "800x600 (4:3)":
-                        width = 800;
-                        height = 600;
+                        width = 800;    height = 600;
                         break;
                     case "720x540 (4:3)":
-                        width = 720;
-                        height = 540;
+                        width = 720;    height = 540;
                         break;
                     case "640x480 (4:3)":
-                        width = 640;
-                        height = 480;
+                        width = 640;    height = 480;
                         break;
                     case "480x360 (4:3)":
-                        width = 480;
-                        height = 360;
+                        width = 480;    height = 360;
                         break;
                     case "320x240 (4:3)":
-                        width = 320;
-                        height = 240;
+                        width = 320;    height = 240;
                         break;
                     case "160x120 (4:3)":
-                        width = 160;
-                        height = 120;
+                        width = 160;    height = 120;
                         break;
                 }
                 width_input.setText(String.valueOf(width));
@@ -351,50 +332,53 @@ public class ExternalCameraActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    @SuppressLint("NonConstantResourceId")
-    public void SwitchClick(View v) {
-        switch (v.getId()) {
-            case R.id.switch1:
-                if (switch1.isChecked()) {
-                    linearLayout_option_1.setVisibility(View.VISIBLE);
-                    linearLayout_option_2.setVisibility(View.GONE);
-                    if (txt_id_res.getParent() == linearLayout_option_2) {
-                        linearLayout_option_2.removeView(txt_id_res);
-                        linearLayout_option_2.removeView(linearLayout_id_res1);
-                        linearLayout_option_2.removeView(linearLayout_id_res2);
-                        linearLayout_option_1.addView(txt_id_res);
-                        linearLayout_option_1.addView(linearLayout_id_res1);
-                        linearLayout_option_1.addView(linearLayout_id_res2);
+    private final View.OnClickListener btnListener = new View.OnClickListener() {
+        @SuppressLint("NonConstantResourceId")
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.switch1:
+                    if (switch1.isChecked()) {
+                        linearLayout_option_1.setVisibility(View.VISIBLE);
+                        linearLayout_option_2.setVisibility(View.GONE);
+                        if (txt_id_res.getParent() == linearLayout_option_2) {
+                            linearLayout_option_2.removeView(txt_id_res);
+                            linearLayout_option_2.removeView(linearLayout_id_res1);
+                            linearLayout_option_2.removeView(linearLayout_id_res2);
+                            linearLayout_option_1.addView(txt_id_res);
+                            linearLayout_option_1.addView(linearLayout_id_res1);
+                            linearLayout_option_1.addView(linearLayout_id_res2);
+                        }
+                    } else {
+                        linearLayout_option_1.setVisibility(View.GONE);
                     }
-                } else {
-                    linearLayout_option_1.setVisibility(View.GONE);
-                }
-                switch2.setChecked(false);
-                break;
+                    switch2.setChecked(false);
+                    break;
 
-            case R.id.switch2:
-                if (switch2.isChecked()) {
-                    linearLayout_option_1.setVisibility(View.GONE);
-                    linearLayout_option_2.setVisibility(View.VISIBLE);
-                    if (txt_id_res.getParent() == linearLayout_option_1) {
-                        linearLayout_option_1.removeView(txt_id_res);
-                        linearLayout_option_1.removeView(linearLayout_id_res1);
-                        linearLayout_option_1.removeView(linearLayout_id_res2);
-                        linearLayout_option_2.addView(txt_id_res);
-                        linearLayout_option_2.addView(linearLayout_id_res1);
-                        linearLayout_option_2.addView(linearLayout_id_res2);
+                case R.id.switch2:
+                    if (switch2.isChecked()) {
+                        linearLayout_option_1.setVisibility(View.GONE);
+                        linearLayout_option_2.setVisibility(View.VISIBLE);
+                        if (txt_id_res.getParent() == linearLayout_option_1) {
+                            linearLayout_option_1.removeView(txt_id_res);
+                            linearLayout_option_1.removeView(linearLayout_id_res1);
+                            linearLayout_option_1.removeView(linearLayout_id_res2);
+                            linearLayout_option_2.addView(txt_id_res);
+                            linearLayout_option_2.addView(linearLayout_id_res1);
+                            linearLayout_option_2.addView(linearLayout_id_res2);
+                        }
+                    } else {
+                        linearLayout_option_2.setVisibility(View.GONE);
                     }
-                } else {
-                    linearLayout_option_2.setVisibility(View.GONE);
-                }
-                switch1.setChecked(false);
-                break;
+                    switch1.setChecked(false);
+                    break;
+            }
         }
-
-    }
+    };
 
     public void onClickPLAY(View v) {
-        Intent intent = new Intent(this, VideoActivity.class);
+        Intent intent = new Intent(this, Video_LogPages.class);
+        //Intent intent = new Intent(this, VideoActivity.class);
         intent.putExtra("Source", "From External Activity");
 
         StringBuilder sb = new StringBuilder();
@@ -437,9 +421,9 @@ public class ExternalCameraActivity extends AppCompatActivity {
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(ExternalCameraActivity.this);
             //builder.setCancelable(false);
-            builder.setTitle("Uyarı!!");
-            builder.setMessage("Lütfen yukarıdaki seçeneklerden birini seçiniz");
-            builder.setPositiveButton("Tamam", (dialogInterface, i) -> {});
+            builder.setTitle(R.string.warning_external_act);
+            builder.setMessage(R.string.warning_ext_act_message);
+            builder.setPositiveButton(R.string.warning_ext_act_pos_btn, (dialogInterface, i) -> {});
             builder.show();
         }
     }

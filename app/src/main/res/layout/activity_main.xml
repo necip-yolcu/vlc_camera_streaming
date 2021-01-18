@@ -16,6 +16,9 @@
         android:background="@color/colorInternalCamera"
         android:onClick="btnClickNextActivity"
         app:srcCompat="@drawable/and_cam" />
+        <!--app:srcCompat="@drawable/and_cam"-->
+    <!---->
+
 
     <ImageButton
         android:id="@+id/img_btn_external"
@@ -25,6 +28,7 @@
         android:background="@color/colorExternalCamera"
         android:onClick="btnClickNextActivity"
         app:srcCompat="@drawable/ip_cam" />
-
+       <!-- app:srcCompat="@drawable/ip_cam" -->
+    <!---->
 
 </LinearLayout>

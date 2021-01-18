@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/search_item"
+        android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="10"
+        android:title="@android:string/search_go"
+        android:visible="false"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="never|collapseActionView" />
+
+    <item
+        android:id="@+id/share_item"
+        android:orderInCategory="11"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/share_item"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+    <item
+        android:id="@+id/pause_thread_item"
+        android:orderInCategory="12"
+        android:icon="@android:drawable/ic_media_pause"
+        android:title="@string/pause_item"
+        app:showAsAction="always" />
+
+    <group
+        android:id="@+id/group_items"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/verbose_item"
+            android:orderInCategory="100"
+            android:title="@string/verbose_item"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/debug_item"
+            android:orderInCategory="101"
+            android:title="@string/debug_item"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/info_item"
+            android:orderInCategory="102"
+            android:title="@string/information_item"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/warning_item"
+            android:orderInCategory="103"
+            android:title="@string/warning_item"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/error_item"
+            android:orderInCategory="104"
+            android:title="@string/error_item"
+            app:showAsAction="never" />
+    </group>
+
+    <item
+        android:id="@+id/clear_item"
+        android:orderInCategory="105"
+        android:title="@string/clear_log_item"
+        app:showAsAction="never" />
+
+</menu>
