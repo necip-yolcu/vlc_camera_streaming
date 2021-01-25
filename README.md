@@ -6,9 +6,6 @@ Having an OpenCV processing on them for detecting motion or face
 
 Counting the number of people as input and output
 
-for apk:
-https://drive.google.com/file/d/11OqM6yyHrLZ6lq5BQrcpHO0lq1q4_vB3/view?usp=sharing
-
 photos:
 ![Screenshot_2021-01-26_001738.jpg](https://user-images.githubusercontent.com/43618473/105770031-c2d9e300-5f6f-11eb-9f24-b1f2168794d2.jpg)
 
@@ -29,3 +26,5 @@ photos:
 ![Screenshot_2021-01-26_002958.jpg](https://user-images.githubusercontent.com/43618473/105770506-5c08f980-5f70-11eb-8542-6edb504ce5c1.jpg)
 
 
+for apk (150mb):
+https://drive.google.com/file/d/11OqM6yyHrLZ6lq5BQrcpHO0lq1q4_vB3/view?usp=sharing
