@@ -1,20 +1,37 @@
 package com.example.necip.vlc_android_camera_streaming;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+
 public class Video_LogPages extends AppCompatActivity {
 
-    @SuppressLint("NonConstantResourceId")
+    String str_data;
+
+    @SuppressLint({"NonConstantResourceId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = this.getIntent();
+        if (intent != null) {
+            str_data = intent.getExtras().getString("Source");
+            if (str_data.equals("From MainActivity Internal-Button")) {
+                setTheme(R.style.AppTheme_InternalCameraStatusBar);
+                setTitle(R.string.internal_camera_title);
+            }
+            else if (str_data.equals("From External Activity")) {
+                setTheme(R.style.AppTheme_ExternalCameraStatusBar);
+                setTitle(R.string.external_camera_title);
+            }
+        }
+
         setContentView(R.layout.video_log_pages);
 
         BottomNavigationView nav_view = findViewById(R.id.nav_view);
@@ -58,6 +75,24 @@ public class Video_LogPages extends AppCompatActivity {
 
         ViewPagerAdapter mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(mViewPagerAdapter);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+
+        Intent gotoBack;
+        if (str_data.equals("From MainActivity Internal-Button")) {
+            gotoBack = new Intent(this, MainActivity.class);
+            startActivity(gotoBack);
+        }
+        else if (str_data.equals("From External Activity")) {
+            gotoBack = new Intent(this, ExternalCameraActivity.class);
+            startActivity(gotoBack);
+        }
+
+        finish();
 
     }
 }

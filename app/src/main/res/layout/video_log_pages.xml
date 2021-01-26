@@ -29,7 +29,8 @@
         app:itemIconTint="@color/bottom_nav_item_selector"
         app:itemTextColor="@color/bottom_nav_item_selector"
         app:labelVisibilityMode="labeled" />
-    <!-- android:background="@color/colorPrimary"
+    <!--
+    android:background="@color/colorPrimary"
          android:background="?android:attr/windowBackground"
          android:background="?android:selectableItemBackground"-->
 

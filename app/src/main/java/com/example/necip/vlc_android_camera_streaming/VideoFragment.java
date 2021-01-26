@@ -268,6 +268,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_video, container, false);
 
+
         video_linearLayout = view.findViewById(R.id.video_linearLayout);
         linear_layout_of_texture = view.findViewById(R.id.linear_layout_of_texture);
         imageView_walking_standing = view.findViewById(R.id.imageView_walking_standing);
@@ -289,6 +290,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
         txt_capacity = view.findViewById(R.id.txt_capacity);
         txt_current = view.findViewById(R.id.txt_current);
         txt_to_enter = view.findViewById(R.id.txt_to_enter);
+
 
         return view;
     }
@@ -1272,7 +1274,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
             if (getActivity() != null)
                 OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_3_0, getActivity(), baseLoaderCallback); //OPENCV_VERSION_3_3_0(arada hata) //OPENCV_VERSION_2_4_11(eskisi) //3_4_0 (hata)
         } else {
-            Toast.makeText(getActivity(), "it works", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "it works", Toast.LENGTH_SHORT).show();
             baseLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
             //cameraBridgeViewBase.enableView();
 

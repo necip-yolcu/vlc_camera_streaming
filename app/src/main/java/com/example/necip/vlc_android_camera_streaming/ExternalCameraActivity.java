@@ -20,6 +20,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ExternalCameraActivity extends AppCompatActivity {
 
@@ -436,5 +437,14 @@ public class ExternalCameraActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+
+        Intent gotoBack = new Intent(this, MainActivity.class);
+        startActivity(gotoBack);
+        finish();
     }
 }

@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     public void btnClickNextActivity(View v) {
         switch (v.getId()) {
             case R.id.img_btn_internal:
-                //Intent intent = new Intent(this, VideoActivity.class);
                 Intent intent = new Intent(this, Video_LogPages.class);
                 intent.putExtra("Source", "From MainActivity Internal-Button");
                 startActivity(intent);
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             //dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#99FF99"));
             //dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#FF0000"));
 
-            Toast.makeText(getApplicationContext(), R.string.switch_lang_item, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), R.string.switch_lang_item, Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);
