@@ -1,10 +1,11 @@
 # vlc_camera_streaming
 
-Choosing android camera or external any IP camera for the input frame.
+1. **Camera Source Selection**: Implemented the capability to choose between the Android device's camera and external IP cameras as input sources for streaming.
 
-Having an OpenCV processing on them for detecting motion or face
+2. **OpenCV Integration**: Integrated the OpenCV library into the project, enabling functionalities like motion detection and facial recognition to be applied to the streaming video.
 
-Counting the number of people as input and output
+3. **People Counting**: Developed a feature that utilizes the input and output streams to accurately count the number of people within the captured video.
+
 
 photos:
 
